@@ -1,10 +1,10 @@
 {
-    "Budget Chapter 1 - table 1.1": {  
+    "Funding": {  
         "Jurisdiction":"String",
         "Federal Funding" : "String",
         "New Homes Over 10 Years":"Integer"
     },
-    "Budget Chapter 1 - chapter 1" : {
+    "Budget" : {
         "Attribute" : "String", 
         "2023-2024":"Integer",
         "2024-2025":"Integer",
