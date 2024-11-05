@@ -1,10 +1,11 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Data {
     private List<Entry> row;
 
     public Data() {
-
+        row = new ArrayList<Entry>();
     }
 
     public Data(List<Entry> row) {

@@ -6,11 +6,11 @@ import java.io.FileReader;
 
 public class DataManager {
     private List<Data> dataSet;
-    private static List<List<String>> records; // the external list represents the file and the
-                                               // internal list
+    private static List<List<String>> records = new ArrayList<>(); // the external list represents the file and the
+                                                                   // internal list
 
     public DataManager(String filePath) {
-        records = new ArrayList<>();
+        dataSet = new ArrayList<Data>();
         this.readData(filePath);
     }
 
