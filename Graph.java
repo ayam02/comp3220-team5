@@ -1,6 +1,5 @@
 public abstract class Graph {
     private String x;
-
     private String y;
     private String description;
 
