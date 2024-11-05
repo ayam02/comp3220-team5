@@ -1,0 +1,37 @@
+{
+    "Budget Chapter 1 - table 1.1": {  
+        "Jurisdiction":"String",
+        "Federal Funding" : "String",
+        "New Homes Over 10 Years":"Integer"
+    },
+    "Budget Chapter 1 - chapter 1" : {
+        "Attribute" : "String", 
+        "2023-2024":"Integer",
+        "2024-2025":"Integer",
+        "2025-2026":"Integer",
+        "2026-2027":"Integer",
+        "2027-2028":"Integer",
+        "2028-2029":"Integer",
+        "Total" : "Integer"
+    },
+    "Housing Data" : {
+        "address" : "String",
+        "price" : "String", 
+        "details" : "String"
+    },
+    "Housing Starts":{
+        "When" : "Date",
+        "Type" : "String",
+        "Alberta" : "Integer",
+        "BritishColumbia" : "Integer",
+        "Canada" : "Integer",
+        "Manitoba" : "Integer",
+        "NewBrunswick" : "Integer",
+        "NewfoundlandAndLabrador" : "Integer",
+        "NovaScotia" : "Integer",
+        "Ontario" : "Integer",
+        "PrinceEdwardIsland" : "Integer",
+        "Quebec" : "Integer",
+        "Saskatchewan" : "Integer"
+    }
+}
