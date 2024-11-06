@@ -1,111 +1,143 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
-public class Map {
+// Strategy Interface defining map operations
+interface MapStrategy<K, V> {
+    void put(K key, V value);
+    V get(K key);
+    void remove(K key);
+    boolean containsKey(K key);
+    int size();
+}
 
-    // Holds data for each city with associated housing metrics
-    private Map<String, CityData> cityDataMap;
+// Concrete strategy using HashMap
+class HashMapStrategy<K, V> implements MapStrategy<K, V> {
+    private final Map<K, V> map;
 
-    // Constructor
-    public Map() {
-        cityDataMap = new HashMap<>();
+    public HashMapStrategy() {
+        map = new HashMap<>();
     }
 
-    // Method to add data for a city
-    public void addCityData(String cityName, CityData data) {
-        cityDataMap.put(cityName, data);
+    public void put(K key, V value) {
+        map.put(key, value);
     }
 
-    // Method to display federal funding for housing in a specific city
-    public void displayFederalFunding(String cityName) {
-        CityData data = cityDataMap.get(cityName);
-        if (data != null) {
-            System.out.println("Federal funding for " + cityName + ": " + data.getFederalFunding());
-        } else {
-            System.out.println("No data available for " + cityName);
-        }
+    public V get(K key) {
+        return map.get(key);
     }
 
-    // Method to display property price trends in a specific city
-    public void displayPropertyPrices(String cityName) {
-        CityData data = cityDataMap.get(cityName);
-        if (data != null) {
-            System.out.println("Property prices for " + cityName + ": " + data.getPropertyPrices());
-        } else {
-            System.out.println("No data available for " + cityName);
-        }
+    public void remove(K key) {
+        map.remove(key);
     }
 
-    // Method to display forecasted housing development in a specific city
-    public void displayHousingForecast(String cityName) {
-        CityData data = cityDataMap.get(cityName);
-        if (data != null) {
-            System.out.println("Housing forecast for " + cityName + ": " + data.getHousingForecast());
-        } else {
-            System.out.println("No data available for " + cityName);
-        }
+    public boolean containsKey(K key) {
+        return map.containsKey(key);
     }
 
-    // Method to render the map with available data (placeholder for actual map rendering)
-    public void renderMap() {
-        System.out.println("Rendering map with data for each city...");
-        for (String cityName : cityDataMap.keySet()) {
-            System.out.println("City: " + cityName + ", Data: " + cityDataMap.get(cityName));
-        }
+    public int size() {
+        return map.size();
     }
 
-    // Inner class to represent data for each city
-    public static class CityData {
-        private double federalFunding;
-        private double propertyPrices;
-        private int housingForecast;
+    @Override
+    public String toString() {
+        return "HashMapStrategy with data: " + map;
+    }
+}
 
-        // Constructor
-        public CityData(double federalFunding, double propertyPrices, int housingForecast) {
-            this.federalFunding = federalFunding;
-            this.propertyPrices = propertyPrices;
-            this.housingForecast = housingForecast;
-        }
+// Concrete strategy using TreeMap
+class TreeMapStrategy<K, V> implements MapStrategy<K, V> {
+    private final Map<K, V> map;
 
-        // Getters
-        public double getFederalFunding() {
-            return federalFunding;
-        }
-
-        public double getPropertyPrices() {
-            return propertyPrices;
-        }
-
-        public int getHousingForecast() {
-            return housingForecast;
-        }
-
-        // Override toString for easy display
-        @Override
-        public String toString() {
-            return "Federal Funding: " + federalFunding + ", Property Prices: " + propertyPrices +
-                    ", Housing Forecast: " + housingForecast;
-        }
+    public TreeMapStrategy() {
+        map = new TreeMap<>();
     }
 
-    // Main method for testing
+    public void put(K key, V value) {
+        map.put(key, value);
+    }
+
+    public V get(K key) {
+        return map.get(key);
+    }
+
+    public void remove(K key) {
+        map.remove(key);
+    }
+
+    public boolean containsKey(K key) {
+        return map.containsKey(key);
+    }
+
+    public int size() {
+        return map.size();
+    }
+
+    @Override
+    public String toString() {
+        return "TreeMapStrategy with data: " + map;
+    }
+}
+
+// Context class to use the map strategies
+class MapContext<K, V> {
+    private MapStrategy<K, V> strategy;
+
+    // Constructor to initialize the strategy
+    public MapContext(MapStrategy<K, V> strategy) {
+        this.strategy = strategy;
+    }
+
+    // Method to switch strategy at runtime
+    public void setStrategy(MapStrategy<K, V> strategy) {
+        this.strategy = strategy;
+    }
+
+    public void put(K key, V value) {
+        strategy.put(key, value);
+    }
+
+    public V get(K key) {
+        return strategy.get(key);
+    }
+
+    public void remove(K key) {
+        strategy.remove(key);
+    }
+
+    public boolean containsKey(K key) {
+        return strategy.containsKey(key);
+    }
+
+    public int size() {
+        return strategy.size();
+    }
+
+    @Override
+    public String toString() {
+        return strategy.toString();
+    }
+}
+
+// Testing the Strategy Pattern implementation
+public class StrategyPatternMapDemo {
     public static void main(String[] args) {
-        Map map = new Map();
+        // Initialize MapContext with HashMapStrategy
+        MapContext<String, Integer> mapContext = new MapContext<>(new HashMapStrategy<>());
 
-        // Sample data for cities
-        CityData torontoData = new CityData(5000000, 800000, 5000);
-        CityData vancouverData = new CityData(3000000, 900000, 3000);
+        // Use the HashMap strategy
+        mapContext.put("A", 1);
+        mapContext.put("B", 2);
+        System.out.println("HashMapStrategy: " + mapContext);
 
-        // Adding city data to the map
-        map.addCityData("Toronto", torontoData);
-        map.addCityData("Vancouver", vancouverData);
+        // Switch to TreeMap strategy at runtime
+        mapContext.setStrategy(new TreeMapStrategy<>());
+        mapContext.put("C", 3);
+        mapContext.put("A", 4);  // TreeMap will maintain sorted order
+        System.out.println("TreeMapStrategy: " + mapContext);
 
-        // Displaying data
-        map.displayFederalFunding("Toronto");
-        map.displayPropertyPrices("Vancouver");
-        map.displayHousingForecast("Toronto");
-
-        // Render map with all data
-        map.renderMap();
+        // Access elements through MapContext
+        System.out.println("Contains key A: " + mapContext.containsKey("A"));
+        System.out.println("Size of map: " + mapContext.size());
     }
 }
