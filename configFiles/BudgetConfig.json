@@ -1,0 +1,10 @@
+{
+    "Attribute" : "String", 
+    "2023-2024":"Integer",
+    "2024-2025":"Integer",
+    "2025-2026":"Integer",
+    "2026-2027":"Integer",
+    "2027-2028":"Integer",
+    "2028-2029":"Integer",
+    "Total" : "Integer"
+}
