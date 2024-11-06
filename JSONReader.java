@@ -1,6 +1,7 @@
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class JSONReader {
@@ -32,7 +33,7 @@ public class JSONReader {
     }
 
     public static Map<String, Object> parseJson(String json) {
-        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> dataMap = new LinkedHashMap<>();
 
         json = json.trim();
         json = json.substring(1, json.length() - 1).trim();

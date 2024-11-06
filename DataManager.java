@@ -3,14 +3,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Map;
 
 public class DataManager {
-    private List<Data> dataSet;
+    private static List<Data> dataSet = new ArrayList<Data>();;
     private static List<List<String>> records = new ArrayList<>(); // the external list represents the file and the
-                                                                   // internal list
+                                                                   // internal list is a row
+    private static Map<String, Object> jsonData;
+
+    public static void main(String args[]) {
+        readData("data/csv/Funding.csv");
+        readJSON("configFiles/FundingConfig.json");
+        populateData();
+    }
 
     public DataManager(String filePath) {
-        dataSet = new ArrayList<Data>();
         this.readData(filePath);
     }
 
@@ -26,13 +33,12 @@ public class DataManager {
         this.dataSet = dataSet;
     }
 
-    public void readData(String filePath) {
-        String line; // represents the row which contains multiple values
-
+    public static void readData(String filePath) {
+        String line;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             while ((line = reader.readLine()) != null) {
-                String[] values = line.split(",");
+                String[] values = line.split(","); // data must be comma delimited
                 records.add(Arrays.asList(values));
             }
             reader.close();
@@ -40,8 +46,57 @@ public class DataManager {
         } catch (Exception e) {
             System.err.println(e);
         }
+    }
 
-        System.err.println(records.get(3).get(1));
+    public static void readJSON(String filePath) {
+        JSONReader jsonreader = new JSONReader(filePath);
+        jsonData = jsonreader.getJsonData();
+    }
+
+    public static void populateData() {
+        // int rowCount = records.size()-1;
+        int rowCount = 4;
+        Object[] keys = jsonData.keySet().toArray();
+
+        for (int i = 2; i < rowCount; i++) { // skip the headers
+            // create a data list and store each entry
+            Data row = new Data();
+
+            for (int j = 0; j < jsonData.keySet().size(); j++) {
+                String type = jsonData.get(keys[j]).toString();
+                // System.out.println(records.get(i).get(j));
+                // System.out.println(type);
+                // System.out.println(keys[j]);
+                String record = records.get(i).get(j);
+                record = record.trim(); // remove leading spaces
+                record = record.replace("\"", "");
+                // System.out.println(record);
+                Object castedRecord = new Object();
+
+                // cast the value and assign the type and assign the key
+                switch (type) {
+                    case "String":
+                        castedRecord = record.toString();
+                        break;
+                    case "Integer":
+                        castedRecord = Integer.valueOf(record);
+                        break;
+                    case "Float":
+                        castedRecord = Integer.valueOf(record);
+                        break;
+                    default:
+                        break;
+                }
+                // create an entry for each data point
+                Entry entry = new Entry(type, castedRecord, keys[i].toString());
+                row.addToRow(entry);
+
+                entry.toString();
+            }
+            // add the row to the data set
+            dataSet.add(row);
+        }
+
     }
 
 }

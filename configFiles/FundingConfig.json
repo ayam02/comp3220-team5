@@ -1,6 +1,7 @@
 
     {  
-        "Jurisdiction":"String",
+        "City":"String",
+        "Province":"String",
         "Federal Funding" : "String",
         "New Homes Over 10 Years":"Integer"
     }
