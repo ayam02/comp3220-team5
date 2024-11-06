@@ -3,16 +3,35 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
 
+/**
+ * The PieChart class represents a custom pie chart component
+ * that displays a pie chart with segments based on provided numbers and labels.
+ * The chart is drawn using Java's Graphics2D API and includes features like
+ * percentage labels inside the slices and category labels outside the slices.
+ */
 public class PieChart extends JPanel {
-    private List<Float> numbers;
-    private List<String> labels;
+    private List<Float> numbers; // List of numbers representing the data for each pie slice
+    private List<String> labels; // List of labels corresponding to each data entry
 
+    /**
+     * Constructor to initialize the PieChart with the provided numbers and labels.
+     *
+     * @param numbers A list of numbers representing the values for each pie slice
+     * @param labels A list of labels corresponding to each data entry
+     */
     public PieChart(List<Float> numbers, List<String> labels) {
         this.numbers = numbers;
         this.labels = labels;
         setBackground(Color.WHITE); // Set background color for the panel
     }
 
+    /**
+     * Paints the pie chart on the JPanel.
+     * This method calculates the angles for each pie slice and draws them on the panel.
+     * It also adds percentage and category labels to the chart.
+     *
+     * @param g The Graphics object used for painting the pie chart
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -21,9 +40,9 @@ public class PieChart extends JPanel {
 
         int width = getWidth();
         int height = getHeight();
-        int diameter = Math.min(width, height) - 50; // Set the diameter of the pie chart
-        int x = (width - diameter) / 2;  // X position for the pie chart
-        int y = (height - diameter) / 2; // Y position for the pie chart
+        int diameter = Math.min(width, height) - 80; // Increased margin for better spacing
+        int x = (width - diameter) / 2;
+        int y = (height - diameter) / 2;
 
         // Calculate the total value of the numbers
         float total = 0;
@@ -44,10 +63,10 @@ public class PieChart extends JPanel {
             g2.setColor(getColorForSlice(i));
             g2.fillArc(x, y, diameter, diameter, (int) startAngle, (int) angle); // Draw the slice
 
-            // Draw outline for the slice
-            g2.setColor(Color.BLACK);
-            g2.setStroke(new BasicStroke(2));  // Stroke for the outline
-            g2.drawArc(x, y, diameter, diameter, (int) startAngle, (int) angle); // Draw arc for outline
+            // Remove thick outline, just add a subtle separator
+            g2.setColor(new Color(255, 255, 255, 128)); // Semi-transparent white
+            g2.setStroke(new BasicStroke(1.0f));
+            g2.drawArc(x, y, diameter, diameter, (int) startAngle, (int) angle);
 
             // Label for each slice (percentage inside the slice)
             String percentageLabel = df.format(percentage * 100) + "%";
@@ -68,23 +87,39 @@ public class PieChart extends JPanel {
             // Update the start angle for the next slice
             startAngle += angle;
         }
-
-        // Draw a border around the pie chart for a neat outline
-        g2.setColor(Color.GRAY);
-        g2.setStroke(new BasicStroke(3));  // Thicker outline for the border
-        g2.drawOval(x, y, diameter, diameter); // Draw circle border
     }
 
-    // Method to generate colors for each slice
+    /**
+     * Returns a color for a pie slice based on its index.
+     * The colors are chosen from a predefined palette.
+     *
+     * @param index The index of the pie slice
+     * @return The color associated with the slice
+     */
     private Color getColorForSlice(int index) {
         Color[] colors = {
-            Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN,
-            Color.MAGENTA, Color.ORANGE, Color.PINK, Color.LIGHT_GRAY
+            new Color(69, 123, 157),   // Soft blue
+            new Color(29, 53, 87),     // Dark blue
+            new Color(168, 218, 220),  // Light turquoise
+            new Color(241, 250, 238),  // Soft white
+            new Color(230, 57, 70),    // Coral red
+            new Color(241, 136, 5),    // Orange
+            new Color(128, 237, 153),  // Mint green
+            new Color(146, 83, 161),   // Purple
+            new Color(240, 138, 93),   // Peach
+            new Color(86, 192, 204),   // Turquoise
+            new Color(223, 120, 87),   // Terracotta
+            new Color(105, 116, 175)   // Muted purple
         };
-        return colors[index % colors.length]; // Cycle through colors if more slices than colors
+        return colors[index % colors.length];
     }
 
-    // Main method to create and show the pie chart
+    /**
+     * Main method to create and display the pie chart in a GUI window.
+     * 
+     * @param numbers A list of numbers representing the values for each pie slice
+     * @param labels A list of labels corresponding to each data entry
+     */
     public static void createAndShowGui(List<Float> numbers, List<String> labels) {
         PieChart pieChart = new PieChart(numbers, labels);
         pieChart.setPreferredSize(new Dimension(800, 600));
