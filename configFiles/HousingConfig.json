@@ -1,0 +1,15 @@
+{
+    "When" : "Date",
+    "Type" : "String",
+    "Alberta" : "Integer",
+    "BritishColumbia" : "Integer",
+    "Canada" : "Integer",
+    "Manitoba" : "Integer",
+    "NewBrunswick" : "Integer",
+    "NewfoundlandAndLabrador" : "Integer",
+    "NovaScotia" : "Integer",
+    "Ontario" : "Integer",
+    "PrinceEdwardIsland" : "Integer",
+    "Quebec" : "Integer",
+    "Saskatchewan" : "Integer"
+}
