@@ -6,16 +6,16 @@ import java.io.FileReader;
 import java.util.Map;
 
 public class DataManager {
-    private static List<Data> dataSet = new ArrayList<Data>();;
-    private static List<List<String>> records = new ArrayList<>(); // the external list represents the file and the
-                                                                   // internal list is a row
-    private static Map<String, Object> jsonData;
+    private List<Data> dataSet = new ArrayList<Data>();;
+    private List<List<String>> records = new ArrayList<>(); // the external list represents the file and the
+                                                            // internal list is a row
+    private Map<String, Object> jsonData;
 
-    public static void main(String args[]) {
-        readData("data/csv/Funding.csv");
-        readJSON("configFiles/FundingConfig.json");
-        populateData();
-    }
+    // public static void main(String args[]) {
+    // readData("data/csv/Funding.csv");
+    // readJSON("configFiles/FundingConfig.json");
+    // populateData();
+    // }
 
     public DataManager(String filePath) {
         this.readData(filePath);
@@ -33,13 +33,13 @@ public class DataManager {
         this.dataSet = dataSet;
     }
 
-    public static void readData(String filePath) {
+    public void readData(String filePath) {
         String line;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             while ((line = reader.readLine()) != null) {
                 String[] values = line.split(","); // data must be comma delimited
-                records.add(Arrays.asList(values));
+                this.records.add(Arrays.asList(values));
             }
             reader.close();
 
@@ -48,15 +48,15 @@ public class DataManager {
         }
     }
 
-    public static void readJSON(String filePath) {
+    public void readJSON(String filePath) {
         JSONReader jsonreader = new JSONReader(filePath);
-        jsonData = jsonreader.getJsonData();
+        this.jsonData = jsonreader.getJsonData();
     }
 
-    public static void populateData() {
-        // int rowCount = records.size()-1;
-        int rowCount = 4;
-        Object[] keys = jsonData.keySet().toArray();
+    public void populateData() {
+        int rowCount = records.size() - 1;
+        // int rowCount = 4;
+        Object[] keys = this.jsonData.keySet().toArray();
 
         for (int i = 2; i < rowCount; i++) { // skip the headers
             // create a data list and store each entry
