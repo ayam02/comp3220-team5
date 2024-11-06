@@ -20,4 +20,8 @@ public class Data {
         this.row = row;
     }
 
+    public void addToRow(Entry entry) {
+        row.add(entry);
+    }
+
 }
