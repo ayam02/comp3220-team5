@@ -5,6 +5,10 @@ import javax.swing.border.AbstractBorder;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * A Swing-based view component that creates a modern dashboard interface for housing data visualization.
+ * This class extends JFrame and implements a responsive UI with a sidebar navigation, charts, and statistics.
+ */
 public class View extends JFrame {
 
     // Inner class for RoundedBorder
@@ -12,6 +16,11 @@ public class View extends JFrame {
         private int radius;
         private Color color;
 
+        /**
+         * Constructs a rounded border with specified radius and color.
+         * @param radius The corner radius in pixels
+         * @param color The border color
+         */
         public RoundedBorder(int radius, Color color) {
             this.radius = radius;
             this.color = color;
@@ -36,10 +45,19 @@ public class View extends JFrame {
     private List<JPanel> navItems = new ArrayList<>();
     private JLabel headerTitle;
 
+    /**
+     * Constructs a new View with the specified data for visualization.
+     * @param xValues List of x-coordinates for line graph
+     * @param yValues List of y-coordinates for line graph
+     * @param pieData List of values for pie chart segments
+     * @param pieLabels List of labels for pie chart segments
+     * @param barCategories List of categories for bar graph
+     * @param barValues List of values for bar graph
+     */
     public View(List<Integer> xValues, List<Integer> yValues, List<Float> pieData, List<String> pieLabels, List<String> barCategories, List<Integer> barValues) {
         registerFont();
         // Basic frame setup
-        setTitle("Federal Housing Funds Dashboard");
+        setTitle("OpenHome");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(0, 0));
         
@@ -79,6 +97,10 @@ public class View extends JFrame {
         setVisible(true);
     }
     
+    /**
+     * Attempts to register the Inter font for use in the application.
+     * Falls back to system fonts if the Inter font is not available.
+     */
     private void registerFont() {
         try {
             // Try to register the Inter font if it exists in the system
@@ -90,6 +112,10 @@ public class View extends JFrame {
         }
     }
     
+    /**
+     * Creates the modern sidebar navigation panel.
+     * @return JPanel containing the sidebar with logo and navigation items
+     */
     private JPanel createModernSidebar() {
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
@@ -118,6 +144,12 @@ public class View extends JFrame {
         return sidebar;
     }
     
+    /**
+     * Adds a navigation item to the sidebar.
+     * @param sidebar The sidebar panel to add the item to
+     * @param text The text label for the navigation item
+     * @param selected Whether this item should be initially selected
+     */
     private void addModernNavItem(JPanel sidebar, String text, boolean selected) {
         JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
         item.setMaximumSize(new Dimension(250, 45));
@@ -182,6 +214,10 @@ public class View extends JFrame {
         sidebar.add(Box.createVerticalStrut(5));
     }
     
+    /**
+     * Creates the header panel with title.
+     * @return JPanel containing the header elements
+     */
     private JPanel createModernHeader() {
         JPanel header = new JPanel(new BorderLayout(20, 0));
         header.setBackground(Color.WHITE);
@@ -195,6 +231,10 @@ public class View extends JFrame {
         return header;
     }
     
+    /**
+     * Creates a list of cities with their funding information.
+     * @return JPanel containing the city list
+     */
     private JPanel createModernCityList() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -219,6 +259,12 @@ public class View extends JFrame {
         return panel;
     }
     
+    /**
+     * Creates a card component for displaying city information.
+     * @param city The name of the city
+     * @param funding The funding amount for the city
+     * @return JPanel containing the city card
+     */
     private JPanel createModernCityCard(String city, String funding) {
         JPanel card = new JPanel(new BorderLayout(10, 5));
         card.setBackground(new Color(250, 252, 255));
@@ -255,6 +301,10 @@ public class View extends JFrame {
         return card;
     }
     
+    /**
+     * Creates a panel containing key statistics.
+     * @return JPanel containing statistics cards
+     */
     private JPanel createModernStatsPanel() {
         JPanel panel = new JPanel(new GridLayout(3, 1, 0, 20));
         panel.setBackground(Color.WHITE);
@@ -266,6 +316,13 @@ public class View extends JFrame {
         return panel;
     }
     
+    /**
+     * Creates a card component for displaying a statistic.
+     * @param value The numerical value or metric
+     * @param label The description of the statistic
+     * @param icon The emoji icon to display
+     * @return JPanel containing the statistic card
+     */
     private JPanel createModernStatCard(String value, String label, String icon) {
         JPanel card = new JPanel(new BorderLayout(10, 0));
         card.setBackground(Color.WHITE);
@@ -303,6 +360,12 @@ public class View extends JFrame {
         return card;
     }
     
+    /**
+     * Creates a card container for content with a title.
+     * @param content The component to be displayed in the card
+     * @param title The title of the card
+     * @return JPanel containing the card
+     */
     private JPanel createCard(JComponent content, String title) {
         JPanel card = new JPanel(new BorderLayout(15, 15));
         card.setBackground(Color.WHITE);
@@ -321,6 +384,10 @@ public class View extends JFrame {
         return card;
     }
 
+    /**
+     * Creates a placeholder panel for upcoming features.
+     * @return JPanel containing the "Coming Soon" message
+     */
     private JPanel createComingSoonPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.WHITE);
@@ -333,6 +400,16 @@ public class View extends JFrame {
         return panel;
     }
 
+    /**
+     * Creates the main dashboard content with charts and statistics.
+     * @param xValues List of x-coordinates for line graph
+     * @param yValues List of y-coordinates for line graph
+     * @param pieData List of values for pie chart segments
+     * @param pieLabels List of labels for pie chart segments
+     * @param barCategories List of categories for bar graph
+     * @param barValues List of values for bar graph
+     * @return JPanel containing the dashboard content
+     */
     private JPanel createDashboardContent(List<Integer> xValues, List<Integer> yValues, List<Float> pieData, List<String> pieLabels, List<String> barCategories, List<Integer> barValues) {
         JPanel contentPanel = new JPanel(new BorderLayout(20, 20));
         contentPanel.setBackground(Color.WHITE);
@@ -368,6 +445,10 @@ public class View extends JFrame {
         return contentPanel;
     }
 
+    /**
+     * Main method to launch the application with sample data.
+     * @param args Command line arguments (not used)
+     */
     public static void main(String[] args) {
         // Sample data for the line graph
         List<Integer> xValues = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
