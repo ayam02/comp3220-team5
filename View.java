@@ -4,6 +4,7 @@ import java.util.List;
 import javax.swing.border.AbstractBorder;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * A Swing-based view component that creates a modern dashboard interface for housing data visualization.
@@ -44,17 +45,26 @@ public class View extends JFrame {
     private JPanel contentCards;
     private List<JPanel> navItems = new ArrayList<>();
     private JLabel headerTitle;
+    private ViewHandler viewHandler;
 
     /**
      * Constructs a new View with the specified data for visualization.
-     * @param xValues List of x-coordinates for line graph
-     * @param yValues List of y-coordinates for line graph
-     * @param pieData List of values for pie chart segments
-     * @param pieLabels List of labels for pie chart segments
-     * @param barCategories List of categories for bar graph
-     * @param barValues List of values for bar graph
+     * @param viewHandler The ViewHandler instance
      */
-    public View(List<Integer> xValues, List<Integer> yValues, List<Float> pieData, List<String> pieLabels, List<String> barCategories, List<Integer> barValues) {
+    public View(ViewHandler viewHandler) {
+        this.viewHandler = viewHandler;
+        DataController controller = viewHandler.getControllersList().get(0);
+        
+        // Get real data from controller
+        List<String> cities = controller.getCityNames();
+        List<Integer> fundingValues = controller.getFundingValues();
+        
+        // Sample data for charts (you'll need to add methods to get this data from your controller)
+        List<Float> pieData = List.of(25f, 25f, 25f, 25f);
+        List<String> pieLabels = List.of("Ontario", "British Columbia", "Nova Scotia", "Other");
+        List<String> barCategories = List.of("Ontario", "BC", "NS", "Other");
+        List<Integer> barValues = List.of(340, 31, 79, 150);
+
         registerFont();
         // Basic frame setup
         setTitle("OpenHome");
@@ -78,7 +88,8 @@ public class View extends JFrame {
         contentCards.setBackground(Color.WHITE);
         
         // Add the main dashboard content
-        JPanel dashboardContent = createDashboardContent(xValues, yValues, pieData, pieLabels, barCategories, barValues);
+        JPanel dashboardContent = createDashboardContent(cities, fundingValues, pieData, pieLabels, 
+                        barCategories, barValues);
         contentCards.add(dashboardContent, "Federal Housing Funds");
         
         // Add placeholder panels for other tabs
@@ -236,27 +247,37 @@ public class View extends JFrame {
      * @return JPanel containing the city list
      */
     private JPanel createModernCityList() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
+        // Create a panel to hold the list
+        JPanel listPanel = new JPanel();
+        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+        listPanel.setBackground(Color.WHITE);
         
-        String[] cities = {
-            "London, Ontario|$74 Million",
-            "Vaughan, Ontario|$59 Million",
-            "Hamilton, Ontario|$93.5 Million",
-            "Halifax, Nova Scotia|$79.3 Million",
-            "Brampton, Ontario|$114 Million",
-            "Kelowna, British Columbia|$31.5 Million"
-        };
+        // Get data from controller
+        DataController controller = viewHandler.getControllersList().get(0);
+        List<String> cities = controller.getCityNames();
+        List<Integer> fundingValues = controller.getFundingValues();
         
-        for (String cityData : cities) {
-            String[] parts = cityData.split("\\|");
-            panel.add(createModernCityCard(parts[0], parts[1]));
-            panel.add(Box.createVerticalStrut(15));
+        // Create cards for each city
+        for (int i = 0; i < cities.size(); i++) {
+            String city = cities.get(i);
+            String funding = "$" + fundingValues.get(i) + " Million";
+            listPanel.add(createModernCityCard(city, funding));
+            listPanel.add(Box.createVerticalStrut(15));
         }
         
-        return panel;
+        // Create a scroll pane and customize it
+        JScrollPane scrollPane = new JScrollPane(listPanel);
+        scrollPane.setBackground(Color.WHITE);
+        scrollPane.setBorder(null);  // Remove border
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // Smooth scrolling
+        
+        // Create a wrapper panel to hold the scroll pane
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.setBackground(Color.WHITE);
+        wrapperPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
+        wrapperPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        return wrapperPanel;
     }
     
     /**
@@ -268,7 +289,10 @@ public class View extends JFrame {
     private JPanel createModernCityCard(String city, String funding) {
         JPanel card = new JPanel(new BorderLayout(10, 5));
         card.setBackground(new Color(250, 252, 255));
-        card.setBorder(new RoundedBorder(10, new Color(230, 230, 230)));
+        card.setBorder(BorderFactory.createCompoundBorder(
+            new RoundedBorder(10, new Color(230, 230, 230)),
+            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+        ));
         
         // Create textPanel first and make it final
         final JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 5));
@@ -402,15 +426,31 @@ public class View extends JFrame {
 
     /**
      * Creates the main dashboard content with charts and statistics.
-     * @param xValues List of x-coordinates for line graph
-     * @param yValues List of y-coordinates for line graph
+     * @param cities List of city names
+     * @param fundingValues List of funding amounts for cities
      * @param pieData List of values for pie chart segments
      * @param pieLabels List of labels for pie chart segments
      * @param barCategories List of categories for bar graph
      * @param barValues List of values for bar graph
      * @return JPanel containing the dashboard content
      */
-    private JPanel createDashboardContent(List<Integer> xValues, List<Integer> yValues, List<Float> pieData, List<String> pieLabels, List<String> barCategories, List<Integer> barValues) {
+    private JPanel createDashboardContent(List<String> cities, List<Integer> fundingValues, List<Float> pieData, List<String> pieLabels, List<String> barCategories, List<Integer> barValues) {
+        // Get provincial data from controller
+        DataController controller = viewHandler.getControllersList().get(0);
+        Map<String, Integer> provincialFunding = controller.getProvincialFunding();
+        
+        // Convert to lists for charts
+        List<String> provinceLabels = new ArrayList<>();
+        List<Float> pieFunding = new ArrayList<>();
+        List<Integer> barFunding = new ArrayList<>();
+        
+        // Convert funding values to millions and add to lists
+        for (Map.Entry<String, Integer> entry : provincialFunding.entrySet()) {
+            provinceLabels.add(entry.getKey());
+            pieFunding.add(entry.getValue().floatValue());
+            barFunding.add(entry.getValue());
+        }
+        
         JPanel contentPanel = new JPanel(new BorderLayout(20, 20));
         contentPanel.setBackground(Color.WHITE);
         
@@ -427,11 +467,11 @@ public class View extends JFrame {
         JPanel chartsPanel = new JPanel(new GridLayout(2, 1, 0, 20));
         chartsPanel.setBackground(Color.WHITE);
         
-        // Add charts and stats as before
-        JPanel pieChartCard = createCard(new PieChart(pieData, pieLabels), "Funding Distribution");
+        // Add charts with provincial data
+        JPanel pieChartCard = createCard(new PieChart(pieFunding, provinceLabels), "Provincial Funding Distribution");
         chartsPanel.add(pieChartCard);
         
-        JPanel barGraphCard = createCard(new BarGraph(barCategories, barValues), "Funding by Region");
+        JPanel barGraphCard = createCard(new BarGraph(provinceLabels, barFunding), "Funding by Province");
         chartsPanel.add(barGraphCard);
         
         rightPanel.add(chartsPanel);
@@ -450,21 +490,11 @@ public class View extends JFrame {
      * @param args Command line arguments (not used)
      */
     public static void main(String[] args) {
-        // Sample data for the line graph
-        List<Integer> xValues = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-        List<Integer> yValues = List.of(5, 9, 6, 7, 8, 6, 7, 10, 9, 8);
-
-        // Sample data for the pie chart
-        List<Float> pieData = List.of(10f, 20f, 30f, 40f);
-        List<String> pieLabels = List.of("Category 1", "Category 2", "Category 3", "Category 4");
-
-        // Sample data for the bar graph
-        List<String> barCategories = List.of("A", "B", "C", "D", "E");
-        List<Integer> barValues = List.of(5, 9, 3, 7, 6);
-
-        // Invoke the Swing UI on the Event Dispatch Thread
         SwingUtilities.invokeLater(() -> {
-            new View(xValues, yValues, pieData, pieLabels, barCategories, barValues); // Create the View with sample data
+            ViewHandler viewHandler = new ViewHandler();
+            DataController controller = new DataController("data/csv/Funding.csv");
+            viewHandler.addController(controller);
+            new View(viewHandler);
         });
     }
 }

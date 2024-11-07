@@ -38,11 +38,10 @@ public class DataManager {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             while ((line = reader.readLine()) != null) {
-                String[] values = line.split(","); // data must be comma delimited
-                this.records.add(Arrays.asList(values));
+                String[] values = line.split("\t");  // Split only on tabs
+                records.add(Arrays.asList(values));
             }
             reader.close();
-
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -54,49 +53,47 @@ public class DataManager {
     }
 
     public void populateData() {
-        int rowCount = records.size() - 1;
-        // int rowCount = 4;
-        Object[] keys = this.jsonData.keySet().toArray();
+        int rowCount = records.size();
+        
+        for (int i = 1; i < rowCount; i++) { // Start from 1 to skip header
+            try {
+                Data row = new Data();
+                List<String> record = records.get(i);
 
-        for (int i = 2; i < rowCount; i++) { // skip the headers
-            // create a data list and store each entry
-            Data row = new Data();
-
-            for (int j = 0; j < jsonData.keySet().size(); j++) {
-                String type = jsonData.get(keys[j]).toString();
-                // System.out.println(records.get(i).get(j));
-                // System.out.println(type);
-                // System.out.println(keys[j]);
-                String record = records.get(i).get(j);
-                record = record.trim(); // remove leading spaces
-                record = record.replace("\"", "");
-                // System.out.println(record);
-                Object castedRecord = new Object();
-
-                // cast the value and assign the type and assign the key
-                switch (type) {
-                    case "String":
-                        castedRecord = record.toString();
-                        break;
-                    case "Integer":
-                        castedRecord = Integer.valueOf(record);
-                        break;
-                    case "Float":
-                        castedRecord = Integer.valueOf(record);
-                        break;
-                    default:
-                        break;
+                // Get the full jurisdiction (city and province together)
+                String fullLocation = record.get(0).replaceAll("\"", "").trim();  // Remove quotes
+                
+                // Get funding value
+                String funding = "";
+                if (record.size() > 1) {
+                    funding = record.get(1).replaceAll("\"", "").trim();  // Remove quotes
                 }
-                // create an entry for each data point
-                Entry entry = new Entry(type, castedRecord, keys[i].toString());
-                row.addToRow(entry);
 
-                entry.toString();
+                // Get homes value
+                Integer homes = 0;
+                if (record.size() > 2) {
+                    String homesStr = record.get(2).replaceAll("\"", "").replace("--", "0").trim();
+                    if (!homesStr.isEmpty()) {
+                        try {
+                            homes = Integer.valueOf(homesStr);
+                        } catch (NumberFormatException e) {
+                            homes = 0;
+                        }
+                    }
+                }
+
+                row.addToRow(new Entry("String", fullLocation, "City"));
+                row.addToRow(new Entry("String", "", "Province")); // Keep this empty since province is now part of city
+                row.addToRow(new Entry("String", funding, "Federal Funding"));
+                row.addToRow(new Entry("Integer", homes, "New Homes Over 10 Years"));
+
+                dataSet.add(row);
+                
+            } catch (Exception e) {
+                System.err.println("Error processing row " + i + ": " + e.getMessage());
+                e.printStackTrace();
             }
-            // add the row to the data set
-            dataSet.add(row);
         }
-
     }
 
 }
