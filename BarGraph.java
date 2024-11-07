@@ -118,39 +118,44 @@ public class BarGraph extends JPanel {
      */
     private void drawBarsAndLabels(Graphics2D g2, int width, int height, int padding, 
                                  int labelPadding, double scale, int barWidth) {
+        // Use consistent font metrics
+        g2.setFont(new Font("Inter", Font.PLAIN, 11));
+        FontMetrics metrics = g2.getFontMetrics();
+        
         for (int i = 0; i < values.size(); i++) {
             int barHeight = (int) (values.get(i) * scale);
             int x = padding + i * barWidth;
             int y = height - padding - barHeight;
 
-            // Get base color for this bar
+            // Adjust bar width for better spacing
+            int actualBarWidth = barWidth - 15;
+            int barX = x + (barWidth - actualBarWidth) / 2;
+
             Color baseColor = barColors[i % barColors.length];
-            
-            // Create subtle gradient
             GradientPaint gradient = new GradientPaint(
-                x, y, baseColor,
-                x, y + barHeight, 
+                barX, y, baseColor,
+                barX, y + barHeight, 
                 new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 245)
             );
             
             g2.setPaint(gradient);
-            
-            // Draw rectangular bar (no rounded corners)
-            g2.fillRect(x, y, barWidth - 10, barHeight);
+            g2.fillRect(barX, y, actualBarWidth, barHeight);
 
-            // Draw category label
-            g2.setColor(textColor);
-            g2.setFont(new Font("Arial", Font.PLAIN, 11));
-            FontMetrics metrics = g2.getFontMetrics();
+            // Category label
             String category = categories.get(i);
             int labelWidth = metrics.stringWidth(category);
-            g2.drawString(category, x + (barWidth - labelWidth)/2, height - padding + labelPadding/2);
+            g2.setColor(textColor);
+            g2.drawString(category, 
+                         x + (barWidth - labelWidth)/2, 
+                         height - padding + labelPadding/2);
 
-            // Draw value label above bar
-            g2.setFont(new Font("Arial", Font.BOLD, 12));
+            // Value label
+            g2.setFont(new Font("Inter", Font.BOLD, 12));
             String value = String.valueOf(values.get(i));
             labelWidth = metrics.stringWidth(value);
-            g2.drawString(value, x + (barWidth - labelWidth)/2, y - 5);
+            g2.drawString(value, 
+                         x + (barWidth - labelWidth)/2, 
+                         y - 8);  // Increased spacing above bar
         }
     }
 

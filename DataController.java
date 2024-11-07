@@ -3,21 +3,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controls and manages housing funding data operations for the Canadian Housing Dashboard.
+ * This controller handles data processing, transformation, and provides methods to extract
+ * visualization-ready datasets for various chart types and displays.
+ */
 public class DataController {
   private DataManager dataManager;
 
+  /**
+   * Constructs a new DataController with the specified CSV data source.
+   * 
+   * @param csvPath The file path to the CSV containing housing funding data
+   */
   public DataController(String csvPath) {
     this.dataManager = new DataManager(csvPath);
     setupController();
   }
 
+  /**
+   * Initializes the controller by loading configuration and populating data structures.
+   */
   private void setupController() {
-    // Read and process the data
     dataManager.readJSON("configFiles/FundingConfig.json");
     dataManager.populateData();
   }
 
-  // Add methods to extract visualization data
+  /**
+   * Retrieves a list of all city names from the dataset.
+   * Cleans location data by removing trailing commas if present.
+   * 
+   * @return A list of city names
+   */
   public List<String> getCityNames() {
     List<String> cities = new ArrayList<>();
     for (Data data : dataManager.getDataSet()) {
@@ -31,6 +48,17 @@ public class DataController {
     return cities;
   }
 
+  /**
+   * Extracts and processes funding values from the dataset.
+   * Handles various numeric formats including:
+   * <ul>
+   *   <li>Removing currency symbols and commas</li>
+   *   <li>Converting string values to integers</li>
+   *   <li>Handling decimal values through rounding</li>
+   * </ul>
+   * 
+   * @return A list of processed funding values as integers
+   */
   public List<Integer> getFundingValues() {
     List<Integer> funding = new ArrayList<>();
     for (Data data : dataManager.getDataSet()) {
@@ -54,10 +82,22 @@ public class DataController {
     return funding;
   }
 
+  /**
+   * Provides access to the underlying data manager.
+   * 
+   * @return The DataManager instance
+   */
   public DataManager getDataManager() {
     return dataManager;
   }
 
+  /**
+   * Calculates the total funding distribution by province.
+   * Returns a map containing the top 4 provinces by funding amount,
+   * with remaining provinces combined into an "Other" category.
+   * 
+   * @return A map of province abbreviations to their total funding values
+   */
   public Map<String, Integer> getProvincialFunding() {
     Map<String, Integer> allFunding = new HashMap<>();
     
@@ -99,6 +139,12 @@ public class DataController {
     return topFunding;
   }
 
+  /**
+   * Converts a full province name or location string to its standard two-letter abbreviation.
+   * 
+   * @param location The location string containing the province name
+   * @return The two-letter province abbreviation, or "Other" if no match is found
+   */
   private String extractProvince(String location) {
     if (location.contains("Ontario")) return "ON";
     if (location.contains("British Columbia")) return "BC";
