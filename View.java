@@ -46,6 +46,11 @@ public class View extends JFrame {
     private List<JPanel> navItems = new ArrayList<>();
     private JLabel headerTitle;
     private ViewHandler viewHandler;
+    private JPanel mapPanel; // Placeholder for the map
+    private JPanel graphPanel; // Panel for the graph and stats
+    private JButton toggleButton; // Button to toggle between map and graph
+    private JPanel housingInitiativesPanel; // Panel for Housing Initiatives
+    private JPanel availableHousingPanel; // Panel for Available Housing
 
     /**
      * Constructs a new View with the specified data for visualization.
@@ -87,15 +92,30 @@ public class View extends JFrame {
         contentCards = new JPanel(cardLayout);
         contentCards.setBackground(Color.WHITE);
         
-        // Add the main dashboard content
-        JPanel dashboardContent = createDashboardContent(cities, fundingValues, pieData, pieLabels, 
-                        barCategories, barValues);
-        contentCards.add(dashboardContent, "Federal Housing Funds");
+        // Initialize panels for different tabs
+        mapPanel = createMapPanel();
+        graphPanel = createDashboardContent(cities, fundingValues, pieData, pieLabels, barCategories, barValues);
+        housingInitiativesPanel = createEmptyPanel("Housing Initiatives Coming Soon...");
+        availableHousingPanel = createEmptyPanel("Available Housing Coming Soon...");
+
+        // Add panels to the card layout
+        contentCards.add(mapPanel, "Map View");
+        contentCards.add(graphPanel, "Graph View");
+        contentCards.add(housingInitiativesPanel, "Housing Initiatives");
+        contentCards.add(availableHousingPanel, "Available Housing");
+
+        // Create toggle button
+        toggleButton = new JButton("Switch to Graph View");
+        toggleButton.addActionListener(e -> toggleView());
+
+        // Add the toggle button to the header
+        headerPanel.add(toggleButton, BorderLayout.EAST);
+
+        // Show the map view by default
+        cardLayout.show(contentCards, "Map View");
         
-        // Add placeholder panels for other tabs
-        contentCards.add(createComingSoonPanel(), "Future Housing Plan");
-        contentCards.add(createComingSoonPanel(), "Housing Initiatives");
-        contentCards.add(createComingSoonPanel(), "Available Housing");
+        // Initially show the toggle button
+        toggleButton.setVisible(true);
         
         mainContent.add(headerPanel, BorderLayout.NORTH);
         mainContent.add(contentCards, BorderLayout.CENTER);
@@ -200,24 +220,31 @@ public class View extends JFrame {
                 label.setForeground(new Color(30, 100, 255));
                 label.setFont(new Font("Inter", Font.BOLD, 14));
                 
-                // Update header title based on selected tab
+                // Update header title and toggle button visibility based on selected tab
                 switch(text) {
                     case "Federal Housing Funds":
                         headerTitle.setText("Federal Funding Towards Housing Across Various Cities in Canada");
+                        cardLayout.show(contentCards, "Map View");
+                        toggleButton.setText("Switch to Graph View");
+                        toggleButton.setVisible(true);
                         break;
                     case "Future Housing Plan":
                         headerTitle.setText("Future Housing Development Plans and Projections");
+                        cardLayout.show(contentCards, "Map View");
+                        toggleButton.setText("Switch to Graph View");
+                        toggleButton.setVisible(true);
                         break;
                     case "Housing Initiatives":
                         headerTitle.setText("Current Housing Initiatives and Programs");
+                        cardLayout.show(contentCards, "Housing Initiatives");
+                        toggleButton.setVisible(false);
                         break;
                     case "Available Housing":
                         headerTitle.setText("Available Housing Units and Properties");
+                        cardLayout.show(contentCards, "Available Housing");
+                        toggleButton.setVisible(false);
                         break;
                 }
-                
-                // Show the corresponding card
-                cardLayout.show(contentCards, text);
             }
         });
         
@@ -335,7 +362,7 @@ public class View extends JFrame {
         
         panel.add(createModernStatCard("$3.7 Billion", "Total Federal Funding Budget", "📊"));
         panel.add(createModernStatCard("39.8 Million", "Total Canadian Population", "👥"));
-        panel.add(createModernStatCard("687,271", "Total New Homes Over 10 Years", "🏠"));
+        panel.add(createModernStatCard("687,271", "Total New Homes Over 10 Years", ""));
         
         return panel;
     }
@@ -483,6 +510,121 @@ public class View extends JFrame {
         contentPanel.add(rightPanel, BorderLayout.CENTER);
         
         return contentPanel;
+    }
+
+    /**
+     * Toggles between the map and graph views.
+     */
+    private void toggleView() {
+        if (toggleButton.getText().equals("Switch to Graph View")) {
+            cardLayout.show(contentCards, "Graph View");
+            toggleButton.setText("Switch to Map View");
+        } else {
+            cardLayout.show(contentCards, "Map View");
+            toggleButton.setText("Switch to Graph View");
+        }
+    }
+
+    /**
+     * Creates a placeholder panel for the map with city markers.
+     * @return JPanel containing the map with city markers
+     */
+    private JPanel createMapPanel() {
+        JPanel panel = new JPanel(null); // Use null layout for absolute positioning
+        panel.setBackground(Color.WHITE);
+
+        // Load the image
+        ImageIcon mapImage = new ImageIcon("Canada_blank_map.svg.png");
+
+        // Scale the image to fit within the desired dimensions
+        Image scaledImage = mapImage.getImage().getScaledInstance(900, 650, Image.SCALE_SMOOTH);
+        ImageIcon scaledMapImage = new ImageIcon(scaledImage);
+
+        // Create a label with the scaled image
+        JLabel imageLabel = new JLabel(scaledMapImage);
+        imageLabel.setBounds(0, 0, 900, 650); // Set bounds for the map image
+        panel.add(imageLabel);
+
+        // Add city markers with adjusted coordinates
+        // addCityMarker(panel, "Toronto", 600, 590);
+        // addCityMarker(panel, "Vancouver", 70, 465);
+        // addCityMarker(panel, "Montreal", 660, 545);
+        // addCityMarker(panel, "Calgary", 190, 480);
+        // addCityMarker(panel, "Edmonton", 200, 450);
+        // addCityMarker(panel, "Ottawa", 630, 560);
+
+        // Add more cities as needed
+        //addCityMarker(panel, "London", 577, 605);
+        addCityMarker(panel, "Vaughan", 595, 587);
+        // addCityMarker(panel, "Hamilton", 590, 600);
+        // addCityMarker(panel, "Halifax", 800, 600);
+        // addCityMarker(panel, "Brampton", 605, 590);
+        // addCityMarker(panel, "Kelowna", 100, 470);
+        // addCityMarker(panel, "Kitchener", 590, 590);
+        // addCityMarker(panel, "Quebec", 700, 550);
+        // addCityMarker(panel, "Moncton", 820, 610);
+        // addCityMarker(panel, "Richmond Hill", 610, 570);
+        // addCityMarker(panel, "Mississauga", 605, 585);
+        // addCityMarker(panel, "Burnaby", 80, 460);
+        // addCityMarker(panel, "Winnipeg", 400, 500);
+        // addCityMarker(panel, "Iqaluit", 750, 300);
+        // addCityMarker(panel, "Summerside", 850, 620);
+        // addCityMarker(panel, "Surrey", 90, 460);
+        // addCityMarker(panel, "Guelph", 595, 585);
+
+        return panel;
+    }
+
+    /**
+     * Adds a city marker to the map panel.
+     * @param panel The panel to add the marker to
+     * @param cityName The name of the city
+     * @param x The x-coordinate for the marker
+     * @param y The y-coordinate for the marker
+     */
+    private void addCityMarker(JPanel panel, String cityName, int x, int y) {
+        JPanel cityMarker = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(Color.RED);
+                g2d.fillOval(0, 0, 10, 10); // Draw a circle
+            }
+        };
+        cityMarker.setBounds(x, y, 10, 10); // Set position and size
+        cityMarker.setOpaque(false); // Make the panel transparent
+
+        // Add hover effect
+        cityMarker.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                cityMarker.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                cityMarker.repaint();
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                cityMarker.repaint();
+            }
+        });
+
+        panel.add(cityMarker, 0); // Add with index 0 to ensure it's on top
+    }
+
+    /**
+     * Creates a placeholder panel with a specified message.
+     * @param message The message to display in the panel
+     * @return JPanel containing the placeholder message
+     */
+    private JPanel createEmptyPanel(String message) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(Color.WHITE);
+
+        JLabel label = new JLabel(message);
+        label.setFont(new Font("Inter", Font.BOLD, 24));
+        label.setForeground(new Color(150, 150, 150));
+
+        panel.add(label);
+        return panel;
     }
 
     /**
