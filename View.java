@@ -4,6 +4,7 @@ import java.util.List;
 import javax.swing.border.AbstractBorder;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -75,7 +76,7 @@ public class View extends JFrame {
         setTitle("OpenHome");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(0, 0));
-        
+
         // Create modern sidebar
         JPanel sidebar = createModernSidebar();
         
@@ -265,7 +266,7 @@ public class View extends JFrame {
         headerTitle = new JLabel("Federal Funding Towards Housing Across Various Cities in Canada");
         headerTitle.setFont(new Font("Inter", Font.BOLD, 24));
         header.add(headerTitle, BorderLayout.WEST);
-        
+
         return header;
     }
     
@@ -273,85 +274,170 @@ public class View extends JFrame {
      * Creates a list of cities with their funding information.
      * @return JPanel containing the city list
      */
-    private JPanel createModernCityList() {
-        // Create a panel to hold the list
-        JPanel listPanel = new JPanel();
-        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-        listPanel.setBackground(Color.WHITE);
-        
-        // Get data from controller
-        DataController controller = viewHandler.getControllersList().get(0);
-        List<String> cities = controller.getCityNames();
-        List<Integer> fundingValues = controller.getFundingValues();
-        
-        // Create cards for each city
-        for (int i = 0; i < cities.size(); i++) {
-            String city = cities.get(i);
-            String funding = "$" + fundingValues.get(i) + " Million";
-            listPanel.add(createModernCityCard(city, funding));
+/**
+ * Creates a list of cities with their funding information.
+ * @return JPanel containing the city list
+ */
+private JPanel createModernCityList() {
+    // Create a panel to hold the list
+    JPanel listPanel = new JPanel();
+    listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+    listPanel.setBackground(Color.WHITE);
+
+    // Create a panel for the Sort buttons
+    JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    sortPanel.setBackground(Color.WHITE);
+
+    // Create the Ascending Sort button
+    JButton sortAscendingButton = new JButton("Sort Ascending");
+    sortAscendingButton.setFont(new Font("Inter", Font.BOLD, 14));
+    sortPanel.add(sortAscendingButton);
+
+    // Create the Descending Sort button
+    JButton sortDescendingButton = new JButton("Sort Descending");
+    sortDescendingButton.setFont(new Font("Inter", Font.BOLD, 14));
+    sortPanel.add(sortDescendingButton);
+
+    // Add sortPanel to the top
+    listPanel.add(sortPanel);
+    listPanel.add(Box.createVerticalStrut(15)); // Add space after the Sort buttons
+
+    // Get data from controller
+    DataController controller = viewHandler.getControllersList().get(0);
+    List<String> cities = controller.getCityNames();
+    List<Integer> fundingValues = controller.getFundingValues();
+
+    // Create cards for each city (to be displayed)
+    List<JPanel> cityCards = new ArrayList<>();
+    for (int i = 0; i < cities.size(); i++) {
+        String city = cities.get(i);
+        String funding = "$" + fundingValues.get(i) + " Million";
+        cityCards.add(createModernCityCard(city, funding));
+    }
+
+    // Add city cards to listPanel
+    for (JPanel cityCard : cityCards) {
+        listPanel.add(cityCard);
+        listPanel.add(Box.createVerticalStrut(15));
+    }
+
+    // ActionListener for the Ascending button
+    sortAscendingButton.addActionListener(e -> {
+        // Sort city cards in ascending order
+        sortCityCards(cityCards, true); // Ascending order
+
+        // Rebuild the list after sorting
+        listPanel.removeAll();
+        listPanel.add(sortPanel);
+        listPanel.add(Box.createVerticalStrut(15)); // Re-add space after the Sort buttons
+        for (JPanel cityCard : cityCards) {
+            listPanel.add(cityCard);
             listPanel.add(Box.createVerticalStrut(15));
         }
-        
-        // Create a scroll pane and customize it
-        JScrollPane scrollPane = new JScrollPane(listPanel);
-        scrollPane.setBackground(Color.WHITE);
-        scrollPane.setBorder(null);  // Remove border
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // Smooth scrolling
-        
-        // Create a wrapper panel to hold the scroll pane
-        JPanel wrapperPanel = new JPanel(new BorderLayout());
-        wrapperPanel.setBackground(Color.WHITE);
-        wrapperPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
-        wrapperPanel.add(scrollPane, BorderLayout.CENTER);
-        
-        return wrapperPanel;
-    }
-    
+
+        // Refresh the view
+        listPanel.revalidate();
+        listPanel.repaint();
+    });
+
+    // ActionListener for the Descending button
+    sortDescendingButton.addActionListener(e -> {
+        // Sort city cards in descending order
+        sortCityCards(cityCards, false); // Descending order
+
+        // Rebuild the list after sorting
+        listPanel.removeAll();
+        listPanel.add(sortPanel);
+        listPanel.add(Box.createVerticalStrut(15)); // Re-add space after the Sort buttons
+        for (JPanel cityCard : cityCards) {
+            listPanel.add(cityCard);
+            listPanel.add(Box.createVerticalStrut(15));
+        }
+
+        // Refresh the view
+        listPanel.revalidate();
+        listPanel.repaint();
+    });
+
+    // Create a scroll pane and customize it
+    JScrollPane scrollPane = new JScrollPane(listPanel);
+    scrollPane.setBackground(Color.WHITE);
+    scrollPane.setBorder(null); // Remove border
+    scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smooth scrolling
+
+    // Create a wrapper panel to hold the scroll pane
+    JPanel wrapperPanel = new JPanel(new BorderLayout());
+    wrapperPanel.setBackground(Color.WHITE);
+    wrapperPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
+    wrapperPanel.add(scrollPane, BorderLayout.CENTER);
+
+    return wrapperPanel;
+}
+
+
+
     /**
      * Creates a card component for displaying city information.
      * @param city The name of the city
      * @param funding The funding amount for the city
      * @return JPanel containing the city card
      */
-    private JPanel createModernCityCard(String city, String funding) {
-        JPanel card = new JPanel(new BorderLayout(10, 5));
-        card.setBackground(new Color(250, 252, 255));
-        card.setBorder(BorderFactory.createCompoundBorder(
-            new RoundedBorder(10, new Color(230, 230, 230)),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
-        ));
-        
-        // Create textPanel first and make it final
-        final JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 5));
-        textPanel.setBackground(new Color(250, 252, 255));
-        
-        // Add hover effect
-        card.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                card.setBackground(new Color(240, 245, 255));
-                textPanel.setBackground(new Color(240, 245, 255));
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                card.setBackground(new Color(250, 252, 255));
-                textPanel.setBackground(new Color(250, 252, 255));
-            }
-        });
-
-        JLabel cityLabel = new JLabel(city);
-        cityLabel.setFont(new Font("Inter", Font.BOLD, 14));
-        
-        JLabel fundingLabel = new JLabel("Federal Funding: " + funding);
-        fundingLabel.setFont(new Font("Inter", Font.PLAIN, 12));
-        fundingLabel.setForeground(Color.GRAY);
-        
-        textPanel.add(cityLabel);
-        textPanel.add(fundingLabel);
-        
-        card.add(textPanel, BorderLayout.CENTER);
-        
-        return card;
+    private JPanel createModernCityCard(String cityName, String funding) {
+        // Create a new panel for the city card
+        JPanel cardPanel = new JPanel();
+        cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
+        cardPanel.setBackground(Color.WHITE);
+        cardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));  // Optional: add border
+    
+        // Create a label for the city name
+        JLabel cityLabel = new JLabel(cityName);
+        cityLabel.setFont(new Font("Inter", Font.BOLD, 16));
+        cityLabel.setAlignmentX(Component.LEFT_ALIGNMENT);  // Left-align the city name
+    
+        // Create a label for the funding amount
+        JLabel fundingLabel = new JLabel(funding);
+        fundingLabel.setFont(new Font("Inter", Font.PLAIN, 14));
+        fundingLabel.setAlignmentX(Component.LEFT_ALIGNMENT);  // Left-align the funding amount
+    
+        // Add the labels to the card panel
+        cardPanel.add(cityLabel);
+        cardPanel.add(Box.createVerticalStrut(10));  // Add space between city and funding labels
+        cardPanel.add(fundingLabel);
+    
+        return cardPanel;
     }
     
+    
+    private void sortCityCards(List<JPanel> cityCards, boolean ascending) {
+    // Get the corresponding data from controller for sorting
+    DataController controller = viewHandler.getControllersList().get(0);
+    List<Integer> fundingValues = controller.getFundingValues();
+    
+    // Sort the city cards based on funding values
+    for (int i = 0; i < cityCards.size(); i++) {
+        for (int j = i + 1; j < cityCards.size(); j++) {
+            // Get funding values for comparison
+            int funding1 = fundingValues.get(i);
+            int funding2 = fundingValues.get(j);
+            if (ascending) {
+                // Ascending order
+                if (funding1 > funding2) {
+                    // Swap the cards
+                    Collections.swap(cityCards, i, j);
+                    Collections.swap(fundingValues, i, j);  // Swap the corresponding funding values as well
+                }
+            } else {
+                // Descending order
+                if (funding1 < funding2) {
+                    // Swap the cards
+                    Collections.swap(cityCards, i, j);
+                    Collections.swap(fundingValues, i, j);  // Swap the corresponding funding values as well
+                }
+            }
+        }
+    }
+}
+
     /**
      * Creates a panel containing key statistics.
      * @return JPanel containing statistics cards
