@@ -11,22 +11,46 @@ import java.util.Map;
  * providing a structured approach to data management and access.
  */
 public class DataManager {
+
     /** Stores processed data entries */
     private List<Data> dataSet = new ArrayList<Data>();
-    
-    /** Stores raw CSV records where the outer list represents the file and the inner list represents rows */
+
+    /**
+     * Stores raw CSV records where the outer list represents the file and the inner
+     * list represents rows
+     */
     private List<List<String>> records = new ArrayList<>();
-    
+
     /** Stores configuration data from JSON */
     private Map<String, Object> jsonData;
+
+    // public static void main(String args[]) {
+    // readJSON("./configFiles/BudgetConfig.json");
+    // readData("./data/csv/Budget.csv");
+    // populateData();
+    // for (int i = 0; i < dataSet.size(); i++) { // loop through rows
+    // System.out.println("Row: " + i + 1);
+    // List<Entry> row = dataSet.get(i).getRow();
+    // for (int j = 0; j < row.size(); j++) { // loop through entries
+    // System.out.println("key = " + row.get(j).getField() + " type = " +
+    // row.get(j).getType() + " value = "
+    // + row.get(j).getValue());
+    // }
+    // System.out.println("");
+    // }
+
+    // }
 
     /**
      * Constructs a DataManager and immediately loads data from the specified file.
      *
      * @param filePath The path to the CSV data file
      */
-    public DataManager(String filePath) {
+    public DataManager(String filePath, String jsonPath) {
+        this.readJSON(jsonPath);
         this.readData(filePath);
+        this.populateData();
+
     }
 
     /**
@@ -67,13 +91,24 @@ public class DataManager {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             while ((line = reader.readLine()) != null) {
-                String[] values = line.split("\t");
-                records.add(Arrays.asList(values));
+                String[] values = line.split(",");
+                this.records.add(Arrays.asList(values));
             }
             reader.close();
         } catch (Exception e) {
             System.err.println(e);
         }
+        // for (int i = 0; i < records.size(); i++) { // loop through the rows
+        // List<String> row = records.get(i);
+        // for (int j = 0; j < row.size(); j++) { // loop through the entries in each
+        // row
+
+        // System.out.println(row.get(j));
+        // }
+        // System.out.println("");
+
+        // }
+        // System.out.println();
     }
 
     /**
@@ -83,58 +118,58 @@ public class DataManager {
      */
     public void readJSON(String filePath) {
         JSONReader jsonreader = new JSONReader(filePath);
-        this.jsonData = jsonreader.getJsonData();
+        jsonData = jsonreader.getJsonData();
     }
 
     /**
      * Processes the raw CSV records into structured Data objects.
      * This method:
      * <ul>
-     *   <li>Skips the header row</li>
-     *   <li>Cleans and validates location data</li>
-     *   <li>Processes funding amounts</li>
-     *   <li>Handles home count data, converting to integers</li>
-     *   <li>Creates structured Data objects for each row</li>
+     * <li>Skips the header row</li>
+     * <li>Cleans and validates location data</li>
+     * <li>Processes funding amounts</li>
+     * <li>Handles home count data, converting to integers</li>
+     * <li>Creates structured Data objects for each row</li>
      * </ul>
-     * Invalid or malformed data is handled gracefully with appropriate error logging.
+     * Invalid or malformed data is handled gracefully with appropriate error
+     * logging.
      */
     public void populateData() {
         int rowCount = records.size();
-        
-        for (int i = 1; i < rowCount; i++) { // Start from 1 to skip header
+        Object[] keys = jsonData.keySet().toArray();
+        int cols = jsonData.keySet().size();
+
+        for (int i = 1; i < rowCount; i++) { // Start from 1 to skip header -- loop through the rows
             try {
-                Data row = new Data();
-                List<String> record = records.get(i);
+                Data row = new Data(); // create a new row object
+                List<String> record = records.get(i); // one row
+                // for (int z = 0; z < record.size(); z++) { // print the entries in each row
+                // System.out.println(record.get(z));
+                // }
+                // System.out.println();
+                for (int j = 0; j < cols; j++) { // loop through the cols (entries in each row)
+                    String type = jsonData.get(keys[j]).toString();
+                    String value = record.get(j).trim(); // get the record and remove leading spaces if they exist
 
-                // Get the full jurisdiction (city and province together)
-                String fullLocation = record.get(0).replaceAll("\"", "").trim();
-                
-                // Get funding value
-                String funding = "";
-                if (record.size() > 1) {
-                    funding = record.get(1).replaceAll("\"", "").trim();
-                }
-
-                // Get homes value
-                Integer homes = 0;
-                if (record.size() > 2) {
-                    String homesStr = record.get(2).replaceAll("\"", "").replace("--", "0").trim();
-                    if (!homesStr.isEmpty()) {
-                        try {
-                            homes = Integer.valueOf(homesStr);
-                        } catch (NumberFormatException e) {
-                            homes = 0;
-                        }
+                    Object castedRecord = new Object();
+                    switch (type) {
+                        case "String":
+                            castedRecord = value.toString();
+                            break;
+                        case "Integer":
+                            castedRecord = Integer.valueOf(value);
+                            break;
+                        case "Float":
+                            castedRecord = Integer.valueOf(value);
+                            break;
+                        default:
+                            break;
                     }
+                    Entry entry = new Entry(type, castedRecord, keys[j].toString());
+                    row.addToRow(entry);
                 }
-
-                row.addToRow(new Entry("String", fullLocation, "City"));
-                row.addToRow(new Entry("String", "", "Province")); // Province is part of city
-                row.addToRow(new Entry("String", funding, "Federal Funding"));
-                row.addToRow(new Entry("Integer", homes, "New Homes Over 10 Years"));
-
                 dataSet.add(row);
-                
+
             } catch (Exception e) {
                 System.err.println("Error processing row " + i + ": " + e.getMessage());
                 e.printStackTrace();
