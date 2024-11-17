@@ -62,13 +62,12 @@ public class DataController {
   public List<Integer> getFundingValues() {
     List<Integer> funding = new ArrayList<>();
     for (Data data : dataManager.getDataSet()) {
-        String fundingStr = (String) data.getRow().get(2).getValue();
+        String fundingStr = data.getRow().get(2).getValue().toString();
         try {
-            // Remove commas, dollar signs, and other non-numeric characters except decimal points
+            // Remove everything except numbers and decimal points
             fundingStr = fundingStr.replaceAll("[^0-9.]", "").trim();
             
             if (!fundingStr.isEmpty()) {
-                // Parse as double first to handle decimal values, then convert to int
                 double value = Double.parseDouble(fundingStr);
                 funding.add((int)Math.round(value));
             } else {
@@ -160,6 +159,21 @@ public class DataController {
     if (location.contains("Northwest Territories")) return "NT";
     if (location.contains("Nunavut")) return "NU";
     return "Other";
+  }
+
+  public List<Integer> getFutureHousingPlans() {
+      List<Integer> futureHousingPlans = new ArrayList<>();
+      for (Data data : dataManager.getDataSet()) {
+          try {
+              // Get the homes value (fourth element in the row)
+              Integer homes = (Integer) data.getRow().get(3).getValue();
+              futureHousingPlans.add(homes != null ? homes : 0);
+          } catch (Exception e) {
+              futureHousingPlans.add(0);
+              System.err.println("Error getting housing plans: " + e.getMessage());
+          }
+      }
+      return futureHousingPlans;
   }
 }
  

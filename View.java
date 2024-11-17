@@ -51,6 +51,7 @@ public class View extends JFrame {
     private JButton toggleButton; // Button to toggle between map and graph
     private JPanel housingInitiativesPanel; // Panel for Housing Initiatives
     private JPanel availableHousingPanel; // Panel for Available Housing
+    private JPanel cityInfoPanel; // Panel to display city information
 
     /**
      * Constructs a new View with the specified data for visualization.
@@ -126,6 +127,26 @@ public class View extends JFrame {
         setSize(1400, 800);
         setLocationRelativeTo(null);
         setVisible(true);
+
+        // Initialize the city info panel with fixed dimensions
+        cityInfoPanel = new JPanel();
+        cityInfoPanel.setLayout(new BorderLayout());
+        cityInfoPanel.setBackground(Color.WHITE);
+        cityInfoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // Create a wrapper panel to control the height
+        JPanel wrapperPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        wrapperPanel.setBackground(Color.WHITE);
+        wrapperPanel.add(cityInfoPanel);
+        
+        // Force the size
+        cityInfoPanel.setPreferredSize(new Dimension(400, 200));
+        cityInfoPanel.setMaximumSize(new Dimension(400, 200));
+        cityInfoPanel.setMinimumSize(new Dimension(400, 200));
+
+        // Add the wrapper panel instead of cityInfoPanel directly
+        wrapperPanel.setBounds(1200, 250, 250, 100); // Set manual coordinates for positioning
+        mainContent.add(wrapperPanel); // Add without layout constraints
     }
     
     /**
@@ -227,12 +248,14 @@ public class View extends JFrame {
                         cardLayout.show(contentCards, "Map View");
                         toggleButton.setText("Switch to Graph View");
                         toggleButton.setVisible(true);
+                        displayCityInfo(""); // Clear any existing city info
                         break;
                     case "Future Housing Plan":
                         headerTitle.setText("Future Housing Development Plans and Projections");
                         cardLayout.show(contentCards, "Map View");
                         toggleButton.setText("Switch to Graph View");
                         toggleButton.setVisible(true);
+                        displayCityInfo(""); // Clear any existing city info
                         break;
                     case "Housing Initiatives":
                         headerTitle.setText("Current Housing Initiatives and Programs");
@@ -282,13 +305,34 @@ public class View extends JFrame {
         // Get data from controller
         DataController controller = viewHandler.getControllersList().get(0);
         List<String> cities = controller.getCityNames();
-        List<Integer> fundingValues = controller.getFundingValues();
+        
+        // Determine which data to display based on selected tab
+        List<Integer> values;
+        String valuePrefix;
+        if (headerTitle.getText().contains("Federal Funding")) {
+            values = controller.getFundingValues();
+            valuePrefix = "$";
+        } else if (headerTitle.getText().contains("Future Housing Plan")) {
+            values = controller.getFutureHousingPlans();
+            valuePrefix = "";
+        } else {
+            // Handle other tabs if necessary
+            values = new ArrayList<>();
+            valuePrefix = "";
+        }
         
         // Create cards for each city
         for (int i = 0; i < cities.size(); i++) {
             String city = cities.get(i);
-            String funding = "$" + fundingValues.get(i) + " Million";
-            listPanel.add(createModernCityCard(city, funding));
+            String valueText;
+            if (headerTitle.getText().contains("Federal Funding")) {
+                valueText = valuePrefix + values.get(i) + " Million";
+            } else if (headerTitle.getText().contains("Future Housing Plan")) {
+                valueText = values.get(i) + " New Homes";
+            } else {
+                valueText = "N/A"; // Default or placeholder value
+            }
+            listPanel.add(createModernCityCard(city, valueText));
             listPanel.add(Box.createVerticalStrut(15));
         }
         
@@ -310,10 +354,10 @@ public class View extends JFrame {
     /**
      * Creates a card component for displaying city information.
      * @param city The name of the city
-     * @param funding The funding amount for the city
+     * @param value The funding amount for the city
      * @return JPanel containing the city card
      */
-    private JPanel createModernCityCard(String city, String funding) {
+    private JPanel createModernCityCard(String city, String value) {
         JPanel card = new JPanel(new BorderLayout(10, 5));
         card.setBackground(new Color(250, 252, 255));
         card.setBorder(BorderFactory.createCompoundBorder(
@@ -340,12 +384,15 @@ public class View extends JFrame {
         JLabel cityLabel = new JLabel(city);
         cityLabel.setFont(new Font("Inter", Font.BOLD, 14));
         
-        JLabel fundingLabel = new JLabel("Federal Funding: " + funding);
-        fundingLabel.setFont(new Font("Inter", Font.PLAIN, 12));
-        fundingLabel.setForeground(Color.GRAY);
+        // Update the funding label based on selected tab
+        String labelPrefix = headerTitle.getText().contains("Federal Funding") ? 
+            "Federal Funding: " : "Future Homes: ";
+        JLabel valueLabel = new JLabel(labelPrefix + value);
+        valueLabel.setFont(new Font("Inter", Font.PLAIN, 12));
+        valueLabel.setForeground(Color.GRAY);
         
         textPanel.add(cityLabel);
-        textPanel.add(fundingLabel);
+        textPanel.add(valueLabel);
         
         card.add(textPanel, BorderLayout.CENTER);
         
@@ -546,31 +593,81 @@ public class View extends JFrame {
         panel.add(imageLabel);
 
         // Add city markers with adjusted coordinates
-        // addCityMarker(panel, "Toronto", 600, 590);
-        // addCityMarker(panel, "Vancouver", 70, 465);
-        // addCityMarker(panel, "Montreal", 660, 545);
-        // addCityMarker(panel, "Calgary", 190, 480);
-        // addCityMarker(panel, "Edmonton", 200, 450);
-        // addCityMarker(panel, "Ottawa", 630, 560);
-
-        // Add more cities as needed
-        //addCityMarker(panel, "London", 577, 605);
-        addCityMarker(panel, "Vaughan", 595, 587);
-        // addCityMarker(panel, "Hamilton", 590, 600);
-        // addCityMarker(panel, "Halifax", 800, 600);
-        // addCityMarker(panel, "Brampton", 605, 590);
-        // addCityMarker(panel, "Kelowna", 100, 470);
-        // addCityMarker(panel, "Kitchener", 590, 590);
-        // addCityMarker(panel, "Quebec", 700, 550);
-        // addCityMarker(panel, "Moncton", 820, 610);
-        // addCityMarker(panel, "Richmond Hill", 610, 570);
-        // addCityMarker(panel, "Mississauga", 605, 585);
-        // addCityMarker(panel, "Burnaby", 80, 460);
-        // addCityMarker(panel, "Winnipeg", 400, 500);
-        // addCityMarker(panel, "Iqaluit", 750, 300);
-        // addCityMarker(panel, "Summerside", 850, 620);
-        // addCityMarker(panel, "Surrey", 90, 460);
-        // addCityMarker(panel, "Guelph", 595, 585);
+        addCityMarker(panel, "Toronto", 602, 595);
+        addCityMarker(panel, "Vancouver", 73, 468);
+        addCityMarker(panel, "Calgary", 190, 480);
+        addCityMarker(panel, "Edmonton", 200, 450);
+        addCityMarker(panel, "Ottawa", 630, 560);
+        addCityMarker(panel, "London", 573, 615);
+        addCityMarker(panel, "Vaughan", 599, 589);
+        addCityMarker(panel, "Hamilton", 595, 605);
+        addCityMarker(panel, "Halifax", 786, 520);
+        addCityMarker(panel, "Brampton", 594, 592);
+        addCityMarker(panel, "Kelowna", 120, 470);
+        addCityMarker(panel, "Kitchener", 584, 602);
+        addCityMarker(panel, "Province of Quebec", 630, 470);
+        addCityMarker(panel, "Moncton", 760, 500);
+        addCityMarker(panel, "Richmond Hill", 604, 588);
+        addCityMarker(panel, "Mississauga", 597, 598); 
+        addCityMarker(panel, "Burnaby", 76, 470);
+        addCityMarker(panel, "Winnipeg", 370, 522);
+        addCityMarker(panel, "Iqaluit", 595, 280);
+        addCityMarker(panel, "Summerside", 771, 494);
+        addCityMarker(panel, "Surrey", 79, 472);
+        addCityMarker(panel, "Guelph", 587, 598);
+        addCityMarker(panel, "Burlington", 596, 602);
+        addCityMarker(panel, "St. Catharines", 606, 607);
+        addCityMarker(panel, "Saint John", 760, 517);
+        addCityMarker(panel, "Kingston", 634, 580);
+        addCityMarker(panel, "Ajax", 607, 593);
+        addCityMarker(panel, "Richmond", 73, 473);
+        addCityMarker(panel, "Milton", 591, 600);
+        addCityMarker(panel, "Fredericton", 750, 505);
+        addCityMarker(panel, "Whitby", 612, 590);
+        addCityMarker(panel, "Squamish", 73, 460);
+        addCityMarker(panel, "Waterloo", 579, 607);
+        addCityMarker(panel, "Regina", 290, 505);
+        addCityMarker(panel, "Coquitlam", 81, 467);
+        addCityMarker(panel, "Charlottetown", 790, 490);
+        // addCityMarker(panel, "Abbotsford", 100, 475);
+        // addCityMarker(panel, "Victoria", 110, 480);
+        // addCityMarker(panel, "Channel-Port Aux Basques", 820, 530);
+        // addCityMarker(panel, "Banff", 210, 490);
+        // addCityMarker(panel, "Campbellton", 775, 495);
+        // addCityMarker(panel, "Marathon", 400, 540);
+        // addCityMarker(panel, "Wolfville", 785, 515);
+        // addCityMarker(panel, "Cape Breton", 800, 500);
+        // addCityMarker(panel, "Woolwich", 595, 615);
+        // addCityMarker(panel, "New Glasgow", 795, 505);
+        // addCityMarker(panel, "Cornwall", 800, 495);
+        // addCityMarker(panel, "Mount Pearl", 830, 540);
+        // addCityMarker(panel, "Saskatoon", 310, 510);
+        // addCityMarker(panel, "Whitehorse", 50, 400);
+        // addCityMarker(panel, "Thunder Bay", 420, 550);
+        // addCityMarker(panel, "Shippagan", 780, 490);
+        // addCityMarker(panel, "North Vancouver", 105, 465);
+        // addCityMarker(panel, "North Grenville", 625, 570);
+        // addCityMarker(panel, "Cap-Acadie", 785, 485);
+        // addCityMarker(panel, "Grand Bouctouche", 790, 480);
+        // addCityMarker(panel, "Tecumseh", 570, 620);
+        // addCityMarker(panel, "Airdrie", 220, 495);
+        // addCityMarker(panel, "Pemberton", 115, 470);
+        // addCityMarker(panel, "Cambridge", 600, 610);
+        // addCityMarker(panel, "Kings County", 805, 510);
+        // addCityMarker(panel, "West Hants", 810, 505);
+        // addCityMarker(panel, "Markham", 610, 595);
+        // addCityMarker(panel, "Antigonish", 815, 500);
+        // addCityMarker(panel, "St. John's", 840, 530);
+        // addCityMarker(panel, "Gibsons", 120, 465);
+        // addCityMarker(panel, "Stratford", 820, 495);
+        // addCityMarker(panel, "Barrie", 605, 605);
+        // addCityMarker(panel, "Three Rivers", 825, 490);
+        // addCityMarker(panel, "Grand Bay-Westfield", 795, 475);
+        // addCityMarker(panel, "Bowen Island", 125, 460);
+        // addCityMarker(panel, "O'Leary", 830, 485);
+        // addCityMarker(panel, "Edmundston", 775, 480);
+        // addCityMarker(panel, "East Hants", 820, 500);
+        // addCityMarker(panel, "Dawson", 60, 390);
 
         return panel;
     }
@@ -589,23 +686,43 @@ public class View extends JFrame {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(Color.RED);
-                g2d.fillOval(0, 0, 10, 10); // Draw a circle
+                g2d.setColor(getBackground());
+                if ("Province of Quebec".equals(cityName)) {
+                    g2d.fillOval(0, 0, 20, 20); // Larger circle for Quebec
+                } else {
+                    g2d.fillOval(0, 0, 5, 5); // Default circle size
+                }
             }
         };
-        cityMarker.setBounds(x, y, 10, 10); // Set position and size
+        cityMarker.setBounds(x, y, "Province of Quebec".equals(cityName) ? 20 : 10, "Province of Quebec".equals(cityName) ? 20 : 10); // Adjust bounds for Quebec
         cityMarker.setOpaque(false); // Make the panel transparent
+        cityMarker.setBackground(Color.RED); // Initial color
 
         // Add hover effect
         cityMarker.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 cityMarker.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                cityMarker.setBackground(Color.BLUE); // Change color on hover
+                cityMarker.setToolTipText(cityName); // Set tooltip to show city name
                 cityMarker.repaint();
             }
+
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
+                cityMarker.setBackground(Color.RED); // Revert color when not hovered
                 cityMarker.repaint();
+            }
+
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                // Display city information when clicked
+                displayCityInfo(cityName);
             }
         });
+
+        // Ensure tooltips show immediately
+        ToolTipManager.sharedInstance().setInitialDelay(0);
 
         panel.add(cityMarker, 0); // Add with index 0 to ensure it's on top
     }
@@ -638,5 +755,78 @@ public class View extends JFrame {
             viewHandler.addController(controller);
             new View(viewHandler);
         });
+    }
+
+    private void displayCityInfo(String cityName) {
+        // Get data from controller
+        DataController controller = viewHandler.getControllersList().get(0);
+        List<String> cities = controller.getCityNames();
+        
+        // Determine which data to display based on selected tab
+        List<Integer> values;
+        String valuePrefix;
+        if (headerTitle.getText().contains("Federal Funding")) {
+            values = controller.getFundingValues();
+            valuePrefix = "$";
+        } else {
+            values = controller.getFutureHousingPlans();
+            valuePrefix = "";
+        }
+
+        // Find the index of the city based on the first word
+        String[] cityNameParts = cityName.split(" ");
+        String firstWord = cityNameParts[0];
+
+        int index = -1;
+        for (int i = 0; i < cities.size(); i++) {
+            if (cities.get(i).startsWith(firstWord)) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index != -1) {
+            String valueText;
+            if (headerTitle.getText().contains("Federal Funding")) {
+                valueText = valuePrefix + values.get(index) + " Million";
+            } else {
+                valueText = values.get(index) + " New Homes";
+            }
+
+            // Create the card layout (rest remains the same)
+            JPanel card = new JPanel(new BorderLayout(5, 0));
+            card.setBackground(new Color(250, 252, 255));
+            card.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(10, new Color(230, 230, 230)),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+            ));
+
+            // Create a more compact layout for the text
+            JPanel textPanel = new JPanel(new GridLayout(3, 1, 0, 0)); // Changed to 3 rows
+            textPanel.setBackground(new Color(250, 252, 255));
+
+            // Add population emoji label
+            JLabel populationLabel = new JLabel("👥"); // Population emoji
+            populationLabel.setFont(new Font("Inter", Font.PLAIN, 30)); // Adjust font size
+            populationLabel.setHorizontalAlignment(SwingConstants.LEFT); // Align emoji to the left
+
+            // Create labels with specified font sizes
+            JLabel cityLabel = new JLabel(cityName);
+            cityLabel.setFont(new Font("Inter", Font.BOLD, 18)); // City name font size
+            JLabel fundingLabel = new JLabel(valueText);
+            fundingLabel.setFont(new Font("Inter", Font.BOLD, 24)); // Increased font size for funding
+            fundingLabel.setForeground(Color.GRAY);
+
+            textPanel.add(populationLabel); // Add emoji to the panel
+            textPanel.add(cityLabel);
+            textPanel.add(fundingLabel);
+            card.add(textPanel, BorderLayout.CENTER);
+
+            // Clear previous content and add new city card
+            cityInfoPanel.removeAll();
+            cityInfoPanel.add(card, BorderLayout.CENTER);
+            cityInfoPanel.revalidate();
+            cityInfoPanel.repaint();
+        }
     }
 }

@@ -109,19 +109,19 @@ public class DataManager {
                 // Get the full jurisdiction (city and province together)
                 String fullLocation = record.get(0).replaceAll("\"", "").trim();
                 
-                // Get funding value
+                // Get funding value (second column)
                 String funding = "";
                 if (record.size() > 1) {
                     funding = record.get(1).replaceAll("\"", "").trim();
                 }
 
-                // Get homes value
+                // Get homes value (third column)
                 Integer homes = 0;
                 if (record.size() > 2) {
                     String homesStr = record.get(2).replaceAll("\"", "").replace("--", "0").trim();
                     if (!homesStr.isEmpty()) {
                         try {
-                            homes = Integer.valueOf(homesStr);
+                            homes = Integer.parseInt(homesStr.replaceAll("[^0-9]", ""));
                         } catch (NumberFormatException e) {
                             homes = 0;
                         }
