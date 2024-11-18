@@ -1,33 +1,20 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
- * Controls and manages housing funding data operations for the Canadian Housing Dashboard.
- * This controller handles data processing, transformation, and provides methods to extract
- * visualization-ready datasets for various chart types and displays.
+ * Controls and manages housing funding data operations for the Canadian Housing
+ * Dashboard.
  */
-public class DataController {
-  private DataManager dataManager;
+public class DataController extends DataManager {
 
   /**
    * Constructs a new DataController with the specified CSV data source.
    * 
    * @param csvPath The file path to the CSV containing housing funding data
    */
-  public DataController(String csvPath) {
-    this.dataManager = new DataManager(csvPath);
-    setupController();
+  public DataController(String csvPath, String configFilePath) {
+    super(csvPath, configFilePath);
   }
 
-  /**
-   * Initializes the controller by loading configuration and populating data structures.
-   */
-  private void setupController() {
-    dataManager.readJSON("configFiles/FundingConfig.json");
-    dataManager.populateData();
-  }
+  public void sort() {
 
   /**
    * Retrieves a list of all city names from the dataset.
@@ -79,63 +66,11 @@ public class DataController {
         }
     }
     return funding;
+
   }
 
-  /**
-   * Provides access to the underlying data manager.
-   * 
-   * @return The DataManager instance
-   */
-  public DataManager getDataManager() {
-    return dataManager;
-  }
+  public void filter() {
 
-  /**
-   * Calculates the total funding distribution by province.
-   * Returns a map containing the top 4 provinces by funding amount,
-   * with remaining provinces combined into an "Other" category.
-   * 
-   * @return A map of province abbreviations to their total funding values
-   */
-  public Map<String, Integer> getProvincialFunding() {
-    Map<String, Integer> allFunding = new HashMap<>();
-    
-    for (Data data : dataManager.getDataSet()) {
-        String location = data.getRow().get(0).getValue().toString();
-        String fundingStr = data.getRow().get(2).getValue().toString()
-            .replaceAll("[^0-9.]", "");
-        
-        try {
-            int funding = (int)Double.parseDouble(fundingStr);
-            
-            // Extract province and convert to abbreviation
-            String province = extractProvince(location);
-            
-            // Add funding to province total
-            allFunding.merge(province, funding, Integer::sum);
-        } catch (NumberFormatException e) {
-            System.err.println("Error parsing funding value: " + fundingStr);
-        }
-    }
-    
-    // Create final map with top 4 + Others
-    Map<String, Integer> topFunding = new HashMap<>();
-    
-    // Sort by value and get top 4
-    allFunding.entrySet().stream()
-        .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
-        .limit(4)
-        .forEach(e -> topFunding.put(e.getKey(), e.getValue()));
-    
-    // Sum remaining provinces into "Other"
-    int otherTotal = allFunding.entrySet().stream()
-        .filter(e -> !topFunding.containsKey(e.getKey()))
-        .mapToInt(Map.Entry::getValue)
-        .sum();
-    
-    topFunding.put("Other", otherTotal);
-    
-    return topFunding;
   }
 
   /**
@@ -174,5 +109,5 @@ public class DataController {
       }
       return futureHousingPlans;
   }
+
 }
- 
