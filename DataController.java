@@ -165,7 +165,6 @@ public class DataController {
       List<Integer> futureHousingPlans = new ArrayList<>();
       for (Data data : dataManager.getDataSet()) {
           try {
-              // Get the homes value (fourth element in the row)
               Integer homes = (Integer) data.getRow().get(3).getValue();
               futureHousingPlans.add(homes != null ? homes : 0);
           } catch (Exception e) {
