@@ -141,6 +141,30 @@ public class DataManager {
 
         for (int i = 1; i < rowCount; i++) { // Start from 1 to skip header -- loop through the rows
             try {
+// <<<<<<< map
+//                 Data row = new Data();
+//                 List<String> record = records.get(i);
+
+//                 // Get the full jurisdiction (city and province together)
+//                 String fullLocation = record.get(0).replaceAll("\"", "").trim();
+                
+//                 // Get funding value (second column)
+//                 String funding = "";
+//                 if (record.size() > 1) {
+//                     funding = record.get(1).replaceAll("\"", "").trim();
+//                 }
+
+//                 // Get homes value (third column)
+//                 Integer homes = 0;
+//                 if (record.size() > 2) {
+//                     String homesStr = record.get(2).replaceAll("\"", "").replace("--", "0").trim();
+//                     if (!homesStr.isEmpty()) {
+//                         try {
+//                             homes = Integer.parseInt(homesStr.replaceAll("[^0-9]", ""));
+//                         } catch (NumberFormatException e) {
+//                             homes = 0;
+//                         }
+// =======
                 Data row = new Data(); // create a new row object
                 List<String> record = records.get(i); // one row
                 // for (int z = 0; z < record.size(); z++) { // print the entries in each row
