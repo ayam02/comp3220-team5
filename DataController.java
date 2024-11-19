@@ -6,11 +6,13 @@ import java.util.List;
  * Dashboard.
  */
 public class DataController extends DataManager {
+  private String name; // represents the name of the data set
 
   /**
    * Constructs a new DataController with the specified CSV data source.
    * 
-   * @param csvPath The file path to the CSV containing housing funding data
+   * @param csvPath        The file path to the CSV containing housing funding
+   *                       data
    * @param configFilePath The file path to the configuration file (if needed)
    */
   public DataController(String csvPath, String configFilePath) {
@@ -44,7 +46,7 @@ public class DataController extends DataManager {
    * Only rows where the specified field matches the given value will be kept.
    * 
    * @param fieldIndex The index of the field (column) to filter by
-   * @param value The value that the field should match
+   * @param value      The value that the field should match
    */
   public void filter(int fieldIndex, String value) {
     // Ensure the dataset is not empty
@@ -65,5 +67,13 @@ public class DataController extends DataManager {
     // Update the dataset with the filtered result
     setDataSet(filteredData);
     System.out.println("Dataset filtered by field index " + fieldIndex + " with value " + value);
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 }
