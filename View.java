@@ -547,56 +547,133 @@ private JPanel createModernCityList() {
      * @param barValues List of values for bar graph
      * @return JPanel containing the dashboard content
      */
-    private JPanel createDashboardContent(List<String> cities, List<Integer> fundingValues, List<Float> pieData, List<String> pieLabels, List<String> barCategories, List<Integer> barValues) {
-        // Get provincial data from controller
+    // private JPanel createDashboardContent(List<String> cities, List<Integer> fundingValues, List<Float> pieData, List<String> pieLabels, List<String> barCategories, List<Integer> barValues) {
+    //     // Get provincial data from controller
+    //     DataController controller = viewHandler.getControllersList().get(0);
+    //     Map<String, Integer> provincialFunding = controller.getProvincialFunding();
+        
+    //     // Convert to lists for charts
+    //     List<String> provinceLabels = new ArrayList<>();
+    //     List<Float> pieFunding = new ArrayList<>();
+    //     List<Integer> barFunding = new ArrayList<>();
+        
+    //     // Convert funding values to millions and add to lists
+    //     for (Map.Entry<String, Integer> entry : provincialFunding.entrySet()) {
+    //         provinceLabels.add(entry.getKey());
+    //         pieFunding.add(entry.getValue().floatValue());
+    //         barFunding.add(entry.getValue());
+    //     }
+        
+    //     JPanel contentPanel = new JPanel(new BorderLayout(20, 20));
+    //     contentPanel.setBackground(Color.WHITE);
+        
+    //     // Create left panel for city list
+    //     JPanel citiesPanel = createModernCityList();
+    //     citiesPanel.setPreferredSize(new Dimension(350, 0));
+    //     citiesPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        
+    //     // Create right panel for charts and stats
+    //     JPanel rightPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+    //     rightPanel.setBackground(Color.WHITE);
+        
+    //     // Create charts panel with vertical layout
+    //     JPanel chartsPanel = new JPanel(new GridLayout(2, 1, 0, 20));
+    //     chartsPanel.setBackground(Color.WHITE);
+        
+    //     // Add charts with provincial data
+    //     JPanel pieChartCard = createCard(new PieChart(pieFunding, provinceLabels), "Provincial Funding Distribution");
+    //     chartsPanel.add(pieChartCard);
+        
+    //     JPanel barGraphCard = createCard(new BarGraph(provinceLabels, barFunding), "Funding by Province");
+    //     chartsPanel.add(barGraphCard);
+        
+    //     rightPanel.add(chartsPanel);
+        
+    //     JPanel statsPanel = createModernStatsPanel();
+    //     rightPanel.add(statsPanel);
+        
+    //     contentPanel.add(citiesPanel, BorderLayout.WEST);
+    //     contentPanel.add(rightPanel, BorderLayout.CENTER);
+        
+    //     return contentPanel;
+    // }
+    private JPanel createDashboardContent() {
         DataController controller = viewHandler.getControllersList().get(0);
         Map<String, Integer> provincialFunding = controller.getProvincialFunding();
-        
-        // Convert to lists for charts
+
         List<String> provinceLabels = new ArrayList<>();
-        List<Float> pieFunding = new ArrayList<>();
         List<Integer> barFunding = new ArrayList<>();
-        
-        // Convert funding values to millions and add to lists
+        List<Float> pieFunding = new ArrayList<>();
+
         for (Map.Entry<String, Integer> entry : provincialFunding.entrySet()) {
             provinceLabels.add(entry.getKey());
-            pieFunding.add(entry.getValue().floatValue());
             barFunding.add(entry.getValue());
+            pieFunding.add(entry.getValue().floatValue());
         }
-        
+
         JPanel contentPanel = new JPanel(new BorderLayout(20, 20));
         contentPanel.setBackground(Color.WHITE);
-        
-        // Create left panel for city list
+
+        // Left panel for cities
         JPanel citiesPanel = createModernCityList();
         citiesPanel.setPreferredSize(new Dimension(350, 0));
-        citiesPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        
-        // Create right panel for charts and stats
+        contentPanel.add(citiesPanel, BorderLayout.WEST);
+
+        // Right panel for graphs
         JPanel rightPanel = new JPanel(new GridLayout(1, 2, 20, 0));
         rightPanel.setBackground(Color.WHITE);
-        
-        // Create charts panel with vertical layout
+
+        // Graphs section
         JPanel chartsPanel = new JPanel(new GridLayout(2, 1, 0, 20));
         chartsPanel.setBackground(Color.WHITE);
-        
-        // Add charts with provincial data
-        JPanel pieChartCard = createCard(new PieChart(pieFunding, provinceLabels), "Provincial Funding Distribution");
+
+        // Adding graphs using polymorphism
+        Graph pieChart = new PieChart(pieFunding, provinceLabels);
+        Graph barGraph = new BarGraph(provinceLabels, barFunding);
+
+        JPanel pieChartCard = createCard(pieChart, "Provincial Funding Distribution");
+        JPanel barGraphCard = createCard(barGraph, "Funding by Province");
+
         chartsPanel.add(pieChartCard);
-        
-        JPanel barGraphCard = createCard(new BarGraph(provinceLabels, barFunding), "Funding by Province");
         chartsPanel.add(barGraphCard);
-        
+
         rightPanel.add(chartsPanel);
-        
+
+        // Stats panel
         JPanel statsPanel = createModernStatsPanel();
         rightPanel.add(statsPanel);
-        
-        contentPanel.add(citiesPanel, BorderLayout.WEST);
+
         contentPanel.add(rightPanel, BorderLayout.CENTER);
-        
         return contentPanel;
     }
+     /**
+     * Creates a reusable card for displaying graphs with a title.
+     *
+     * @param graph The graph to be displayed
+     * @param title The title of the graph
+     * @return A JPanel containing the graph and its title
+     */
+    private JPanel createCard(Graph graph, String title) {
+        JPanel cardPanel = new JPanel(new BorderLayout());
+        cardPanel.setBackground(Color.WHITE);
+        cardPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+
+        JLabel titleLabel = new JLabel(title, JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
+        graph.renderGraph(); // Call the graph's renderGraph method
+
+        cardPanel.add(titleLabel, BorderLayout.NORTH);
+        cardPanel.add(graph, BorderLayout.CENTER);
+
+        return cardPanel;
+    }
+
+
+
+
+
 
     /**
      * Toggles between the map and graph views.

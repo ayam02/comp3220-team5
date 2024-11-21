@@ -2,17 +2,27 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class LineGraph extends JPanel {
+/**
+ * The LineGraph class represents a customizable line graph component.
+ * It supports drawing grid lines, axis labels, and a line connecting data points.
+ */
+public class LineGraph extends Graph {
     private List<Integer> xValues;
     private List<Integer> yValues;
-    private Color lineColor = Color.BLUE;
-    private Color pointColor = Color.RED;
-    private Color gridColor = new Color(200, 200, 200);
+    private Color lineColor = new Color(44, 102, 230, 180); // Semi-transparent blue for line
+    private Color pointColor = new Color(220, 20, 60);      // Crimson for points
+    private Color gridColor = new Color(200, 200, 200);     // Light gray for grid lines
 
+    /**
+     * Constructor to initialize the LineGraph with x and y values.
+     *
+     * @param xValues List of x-axis values
+     * @param yValues List of y-axis values
+     */
     public LineGraph(List<Integer> xValues, List<Integer> yValues) {
         this.xValues = xValues;
         this.yValues = yValues;
-        setBackground(Color.WHITE); // Set background color for the panel
+        setBackground(Color.WHITE); // Set background color for the graph
     }
 
     @Override
@@ -26,20 +36,20 @@ public class LineGraph extends JPanel {
         int padding = 50;
         int labelPadding = 30;
 
-        // Find the maximum x and y values to scale the graph
+        // Find the maximum x and y values for scaling
         int maxX = xValues.stream().max(Integer::compare).orElse(1);
         int maxY = yValues.stream().max(Integer::compare).orElse(1);
 
-        // Calculate scaling factors for x and y axes
-        double xScale = (width - 2 * padding) / (double) maxX;
-        double yScale = (height - 2 * padding - labelPadding) / (double) maxY;
+        // Calculate scaling factors
+        double xScale = (width - 2.0 * padding) / maxX;
+        double yScale = (height - 2.0 * padding - labelPadding) / maxY;
 
         // Draw grid lines and y-axis labels
         int numGridLines = 5;
         for (int i = 0; i <= numGridLines; i++) {
-            int y = height - padding - (int) (i * (height - 2 * padding) / (double) numGridLines);
+            int y = height - padding - (int) (i * (height - 2.0 * padding - labelPadding) / numGridLines);
             g2.setColor(gridColor);
-            g2.drawLine(padding, y, width - padding, y); // Draw grid line
+            g2.drawLine(padding, y, width - padding, y); // Horizontal grid line
 
             // Draw y-axis label
             g2.setColor(Color.BLACK);
@@ -52,7 +62,7 @@ public class LineGraph extends JPanel {
             int x = padding + (int) (xValues.get(i) * xScale);
             g2.setColor(Color.BLACK);
             String xLabel = String.valueOf(xValues.get(i));
-            g2.drawString(xLabel, x - 10, height - padding + labelPadding / 2);
+            g2.drawString(xLabel, x - g2.getFontMetrics().stringWidth(xLabel) / 2, height - padding + labelPadding / 2);
         }
 
         // Draw axes
@@ -76,14 +86,30 @@ public class LineGraph extends JPanel {
         for (int i = 0; i < xValues.size(); i++) {
             int x = padding + (int) (xValues.get(i) * xScale);
             int y = height - padding - (int) (yValues.get(i) * yScale);
-            g2.fillOval(x - 4, y - 4, 8, 8);
+            g2.fillOval(x - 4, y - 4, 8, 8); // Draw each point as a circle
         }
 
         // Draw axis labels
-        g2.setFont(new Font("Arial", Font.BOLD, 12));
+        g2.setFont(new Font("Arial", Font.BOLD, 14));
         g2.drawString("X Axis", width / 2, height - 10); // X-axis label
         g2.drawString("Y Axis", 15, height / 2);         // Y-axis label
     }
+
+    /**
+     * Launches a JFrame to display the line graph.
+     *
+     * @param xValues List of x-axis values
+     * @param yValues List of y-axis values
+     */
+    public static void createAndShowGui(List<Integer> xValues, List<Integer> yValues) {
+        LineGraph lineGraph = new LineGraph(xValues, yValues);
+        lineGraph.setPreferredSize(new Dimension(800, 600));
+
+        JFrame frame = new JFrame("Line Graph");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(lineGraph);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
 }
-
-
