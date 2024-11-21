@@ -24,6 +24,12 @@ public abstract class Graph extends JPanel {
     protected abstract void paintComponent(Graphics g);
 
     /**
+     * Abstract method to render the graph. Subclasses should implement this to
+     * trigger the repaint process, which will call paintComponent().
+     */
+    public abstract void renderGraph();
+
+    /**
      * Utility method to display the graph in a JFrame.
      *
      * @param title The title of the window

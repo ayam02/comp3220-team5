@@ -27,7 +27,6 @@ public class LineGraph extends Graph {
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -96,6 +95,19 @@ public class LineGraph extends Graph {
     }
 
     /**
+     * Render the graph by showing it in a JFrame.
+     */
+    public void renderGraph() {
+        JFrame frame = new JFrame("Line Graph");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(this); // Add this LineGraph component to the frame
+        frame.setPreferredSize(new Dimension(800, 600));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    /**
      * Launches a JFrame to display the line graph.
      *
      * @param xValues List of x-axis values
@@ -103,13 +115,6 @@ public class LineGraph extends Graph {
      */
     public static void createAndShowGui(List<Integer> xValues, List<Integer> yValues) {
         LineGraph lineGraph = new LineGraph(xValues, yValues);
-        lineGraph.setPreferredSize(new Dimension(800, 600));
-
-        JFrame frame = new JFrame("Line Graph");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(lineGraph);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        lineGraph.renderGraph(); // Call the renderGraph method
     }
 }

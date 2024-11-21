@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
@@ -57,6 +56,7 @@ public class BarGraph extends Graph {
 
     /**
      * Renders the graph.
+     * This triggers the repaint method, which calls paintComponent to redraw the graph.
      */
     @Override
     public void renderGraph() {
@@ -76,7 +76,6 @@ public class BarGraph extends Graph {
      */
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 

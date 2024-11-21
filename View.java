@@ -278,6 +278,101 @@ public class View extends JFrame {
  * Creates a list of cities with their funding information.
  * @return JPanel containing the city list
  */
+// private JPanel createModernCityList() {
+//     // Create a panel to hold the list
+//     JPanel listPanel = new JPanel();
+//     listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+//     listPanel.setBackground(Color.WHITE);
+
+//     // Create a panel for the Sort buttons
+//     JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//     sortPanel.setBackground(Color.WHITE);
+
+//     // Create the Ascending Sort button
+//     JButton sortAscendingButton = new JButton("Sort Ascending");
+//     sortAscendingButton.setFont(new Font("Inter", Font.BOLD, 14));
+//     sortPanel.add(sortAscendingButton);
+
+//     // Create the Descending Sort button
+//     JButton sortDescendingButton = new JButton("Sort Descending");
+//     sortDescendingButton.setFont(new Font("Inter", Font.BOLD, 14));
+//     sortPanel.add(sortDescendingButton);
+
+//     // Add sortPanel to the top
+//     listPanel.add(sortPanel);
+//     listPanel.add(Box.createVerticalStrut(15)); // Add space after the Sort buttons
+
+//     // Get data from controller
+//     DataController controller = viewHandler.getControllersList().get(0);
+//     List<String> cities = controller.getCityNames();
+//     List<Integer> fundingValues = controller.getFundingValues();
+
+//     // Create cards for each city (to be displayed)
+//     List<JPanel> cityCards = new ArrayList<>();
+//     for (int i = 0; i < cities.size(); i++) {
+//         String city = cities.get(i);
+//         String funding = "$" + fundingValues.get(i) + " Million";
+//         cityCards.add(createModernCityCard(city, funding));
+//     }
+
+//     // Add city cards to listPanel
+//     for (JPanel cityCard : cityCards) {
+//         listPanel.add(cityCard);
+//         listPanel.add(Box.createVerticalStrut(15));
+//     }
+
+//     // ActionListener for the Ascending button
+//     sortAscendingButton.addActionListener(e -> {
+//         // Sort city cards in ascending order
+//         sortCityCards(cityCards, true); // Ascending order
+
+//         // Rebuild the list after sorting
+//         listPanel.removeAll();
+//         listPanel.add(sortPanel);
+//         listPanel.add(Box.createVerticalStrut(15)); // Re-add space after the Sort buttons
+//         for (JPanel cityCard : cityCards) {
+//             listPanel.add(cityCard);
+//             listPanel.add(Box.createVerticalStrut(15));
+//         }
+
+//         // Refresh the view
+//         listPanel.revalidate();
+//         listPanel.repaint();
+//     });
+
+//     // ActionListener for the Descending button
+//     sortDescendingButton.addActionListener(e -> {
+//         // Sort city cards in descending order
+//         sortCityCards(cityCards, false); // Descending order
+
+//         // Rebuild the list after sorting
+//         listPanel.removeAll();
+//         listPanel.add(sortPanel);
+//         listPanel.add(Box.createVerticalStrut(15)); // Re-add space after the Sort buttons
+//         for (JPanel cityCard : cityCards) {
+//             listPanel.add(cityCard);
+//             listPanel.add(Box.createVerticalStrut(15));
+//         }
+
+//         // Refresh the view
+//         listPanel.revalidate();
+//         listPanel.repaint();
+//     });
+
+//     // Create a scroll pane and customize it
+//     JScrollPane scrollPane = new JScrollPane(listPanel);
+//     scrollPane.setBackground(Color.WHITE);
+//     scrollPane.setBorder(null); // Remove border
+//     scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smooth scrolling
+
+//     // Create a wrapper panel to hold the scroll pane
+//     JPanel wrapperPanel = new JPanel(new BorderLayout());
+//     wrapperPanel.setBackground(Color.WHITE);
+//     wrapperPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
+//     wrapperPanel.add(scrollPane, BorderLayout.CENTER);
+
+//     return wrapperPanel;
+// }
 private JPanel createModernCityList() {
     // Create a panel to hold the list
     JPanel listPanel = new JPanel();
@@ -302,12 +397,12 @@ private JPanel createModernCityList() {
     listPanel.add(sortPanel);
     listPanel.add(Box.createVerticalStrut(15)); // Add space after the Sort buttons
 
-    // Get data from controller
+    // Get data from the controller
     DataController controller = viewHandler.getControllersList().get(0);
     List<String> cities = controller.getCityNames();
     List<Integer> fundingValues = controller.getFundingValues();
 
-    // Create cards for each city (to be displayed)
+    // Create city cards
     List<JPanel> cityCards = new ArrayList<>();
     for (int i = 0; i < cities.size(); i++) {
         String city = cities.get(i);
@@ -315,7 +410,7 @@ private JPanel createModernCityList() {
         cityCards.add(createModernCityCard(city, funding));
     }
 
-    // Add city cards to listPanel
+    // Add city cards to the list panel
     for (JPanel cityCard : cityCards) {
         listPanel.add(cityCard);
         listPanel.add(Box.createVerticalStrut(15));
@@ -325,38 +420,14 @@ private JPanel createModernCityList() {
     sortAscendingButton.addActionListener(e -> {
         // Sort city cards in ascending order
         sortCityCards(cityCards, true); // Ascending order
-
-        // Rebuild the list after sorting
-        listPanel.removeAll();
-        listPanel.add(sortPanel);
-        listPanel.add(Box.createVerticalStrut(15)); // Re-add space after the Sort buttons
-        for (JPanel cityCard : cityCards) {
-            listPanel.add(cityCard);
-            listPanel.add(Box.createVerticalStrut(15));
-        }
-
-        // Refresh the view
-        listPanel.revalidate();
-        listPanel.repaint();
+        rebuildCityList(listPanel, sortPanel, cityCards);
     });
 
     // ActionListener for the Descending button
     sortDescendingButton.addActionListener(e -> {
         // Sort city cards in descending order
         sortCityCards(cityCards, false); // Descending order
-
-        // Rebuild the list after sorting
-        listPanel.removeAll();
-        listPanel.add(sortPanel);
-        listPanel.add(Box.createVerticalStrut(15)); // Re-add space after the Sort buttons
-        for (JPanel cityCard : cityCards) {
-            listPanel.add(cityCard);
-            listPanel.add(Box.createVerticalStrut(15));
-        }
-
-        // Refresh the view
-        listPanel.revalidate();
-        listPanel.repaint();
+        rebuildCityList(listPanel, sortPanel, cityCards);
     });
 
     // Create a scroll pane and customize it
@@ -372,6 +443,23 @@ private JPanel createModernCityList() {
     wrapperPanel.add(scrollPane, BorderLayout.CENTER);
 
     return wrapperPanel;
+}
+
+/**
+ * Helper method to rebuild the city list after sorting.
+ */
+private void rebuildCityList(JPanel listPanel, JPanel sortPanel, List<JPanel> cityCards) {
+    listPanel.removeAll();
+    listPanel.add(sortPanel);
+    listPanel.add(Box.createVerticalStrut(15)); // Re-add space after the Sort buttons
+    for (JPanel cityCard : cityCards) {
+        listPanel.add(cityCard);
+        listPanel.add(Box.createVerticalStrut(15));
+    }
+
+    // Refresh the view
+    listPanel.revalidate();
+    listPanel.repaint();
 }
 
 
@@ -442,16 +530,29 @@ private JPanel createModernCityList() {
      * Creates a panel containing key statistics.
      * @return JPanel containing statistics cards
      */
+    // private JPanel createModernStatsPanel() {
+    //     JPanel panel = new JPanel(new GridLayout(3, 1, 0, 20));
+    //     panel.setBackground(Color.WHITE);
+        
+    //     panel.add(createModernStatCard("$3.7 Billion", "Total Federal Funding Budget", "📊"));
+    //     panel.add(createModernStatCard("39.8 Million", "Total Canadian Population", "👥"));
+    //     panel.add(createModernStatCard("687,271", "Total New Homes Over 10 Years", ""));
+        
+    //     return panel;
+    // }
     private JPanel createModernStatsPanel() {
+        // Panel for holding statistics cards
         JPanel panel = new JPanel(new GridLayout(3, 1, 0, 20));
         panel.setBackground(Color.WHITE);
-        
+    
+        // Adding statistical cards to the panel
         panel.add(createModernStatCard("$3.7 Billion", "Total Federal Funding Budget", "📊"));
         panel.add(createModernStatCard("39.8 Million", "Total Canadian Population", "👥"));
         panel.add(createModernStatCard("687,271", "Total New Homes Over 10 Years", ""));
-        
+    
         return panel;
     }
+    
     
     /**
      * Creates a card component for displaying a statistic.
@@ -597,7 +698,7 @@ private JPanel createModernCityList() {
         
     //     return contentPanel;
     // }
-    private JPanel createDashboardContent() {
+    private JPanel createDashboardContent(List<String> cityNames, List<Integer> fundingValues, List<Float> pieData, List<String> pieLabels, List<String> otherLabels, List<Integer> otherData) {
         DataController controller = viewHandler.getControllersList().get(0);
         Map<String, Integer> provincialFunding = controller.getProvincialFunding();
 

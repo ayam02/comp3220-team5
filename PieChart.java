@@ -25,6 +25,14 @@ public class PieChart extends Graph {
     }
 
     /**
+     * Renders the graph by calling repaint to trigger the paintComponent method.
+     */
+    @Override
+    public void renderGraph() {
+        repaint();
+    }
+
+    /**
      * Paints the pie chart on the JPanel.
      * This method calculates the angles for each pie slice and draws them.
      *
@@ -32,7 +40,6 @@ public class PieChart extends Graph {
      */
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
