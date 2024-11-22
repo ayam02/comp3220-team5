@@ -4,6 +4,7 @@ import java.util.List;
 import javax.swing.border.AbstractBorder;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -301,56 +302,92 @@ public class View extends JFrame {
         JPanel listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         listPanel.setBackground(Color.WHITE);
-        
-        // Get data from controller
+    
+        // Create a panel for the Sort buttons
+        JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        sortPanel.setBackground(Color.WHITE);
+    
+        // Create the Ascending Sort button
+        JButton sortAscendingButton = new JButton("Sort Ascending");
+        sortAscendingButton.setFont(new Font("Inter", Font.BOLD, 14));
+        sortPanel.add(sortAscendingButton);
+    
+        // Create the Descending Sort button
+        JButton sortDescendingButton = new JButton("Sort Descending");
+        sortDescendingButton.setFont(new Font("Inter", Font.BOLD, 14));
+        sortPanel.add(sortDescendingButton);
+    
+        // Add sortPanel to the top
+        listPanel.add(sortPanel);
+        listPanel.add(Box.createVerticalStrut(15)); // Add space after the Sort buttons
+    
+        // Get data from the controller
         DataController controller = viewHandler.getControllersList().get(0);
         List<String> cities = controller.getCityNames();
-        
-        // Determine which data to display based on selected tab
-        List<Integer> values;
-        String valuePrefix;
-        if (headerTitle.getText().contains("Federal Funding")) {
-            values = controller.getFundingValues();
-            valuePrefix = "$";
-        } else if (headerTitle.getText().contains("Future Housing Plan")) {
-            values = controller.getFutureHousingPlans();
-            valuePrefix = "";
-        } else {
-            // Handle other tabs if necessary
-            values = new ArrayList<>();
-            valuePrefix = "";
-        }
-        
-        // Create cards for each city
+        List<Integer> fundingValues = controller.getFundingValues();
+    
+        // Create city cards
+        List<JPanel> cityCards = new ArrayList<>();
         for (int i = 0; i < cities.size(); i++) {
             String city = cities.get(i);
-            String valueText;
-            if (headerTitle.getText().contains("Federal Funding")) {
-                valueText = valuePrefix + values.get(i) + " Million";
-            } else if (headerTitle.getText().contains("Future Housing Plan")) {
-                valueText = values.get(i) + " New Homes";
-            } else {
-                valueText = "N/A"; // Default or placeholder value
-            }
-            listPanel.add(createModernCityCard(city, valueText));
+            String funding = "$" + fundingValues.get(i) + " Million";
+            cityCards.add(createModernCityCard(city, funding));
+        }
+    
+        // Add city cards to the list panel
+        for (JPanel cityCard : cityCards) {
+            listPanel.add(cityCard);
             listPanel.add(Box.createVerticalStrut(15));
         }
-        
+    
+        // ActionListener for the Ascending button
+        sortAscendingButton.addActionListener(e -> {
+            // Sort city cards in ascending order
+            sortCityCards(cityCards, true); // Ascending order
+            rebuildCityList(listPanel, sortPanel, cityCards);
+        });
+    
+        // ActionListener for the Descending button
+        sortDescendingButton.addActionListener(e -> {
+            // Sort city cards in descending order
+            sortCityCards(cityCards, false); // Descending order
+            rebuildCityList(listPanel, sortPanel, cityCards);
+        });
+    
         // Create a scroll pane and customize it
         JScrollPane scrollPane = new JScrollPane(listPanel);
         scrollPane.setBackground(Color.WHITE);
-        scrollPane.setBorder(null);  // Remove border
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);  // Smooth scrolling
-        
+        scrollPane.setBorder(null); // Remove border
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smooth scrolling
+    
         // Create a wrapper panel to hold the scroll pane
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         wrapperPanel.setBackground(Color.WHITE);
         wrapperPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
         wrapperPanel.add(scrollPane, BorderLayout.CENTER);
-        
+    
         return wrapperPanel;
     }
+     
+    /**
+ * Helper method to rebuild the city list after sorting.
+ */
+private void rebuildCityList(JPanel listPanel, JPanel sortPanel, List<JPanel> cityCards) {
+    listPanel.removeAll();
+    listPanel.add(sortPanel);
+    listPanel.add(Box.createVerticalStrut(15)); // Re-add space after the Sort buttons
+    for (JPanel cityCard : cityCards) {
+        listPanel.add(cityCard);
+        listPanel.add(Box.createVerticalStrut(15));
+    }
+
+    // Refresh the view
+    listPanel.revalidate();
+    listPanel.repaint();
+}
+
     
+     
     /**
      * Creates a card component for displaying city information.
      * @param city The name of the city
@@ -399,21 +436,54 @@ public class View extends JFrame {
         return card;
     }
     
+
+     private void sortCityCards(List<JPanel> cityCards, boolean ascending) {
+    // Get the corresponding data from controller for sorting
+    DataController controller = viewHandler.getControllersList().get(0);
+    List<Integer> fundingValues = controller.getFundingValues();
+    
+    // Sort the city cards based on funding values
+    for (int i = 0; i < cityCards.size(); i++) {
+        for (int j = i + 1; j < cityCards.size(); j++) {
+            // Get funding values for comparison
+            int funding1 = fundingValues.get(i);
+            int funding2 = fundingValues.get(j);
+            if (ascending) {
+                // Ascending order
+                if (funding1 > funding2) {
+                    // Swap the cards
+                    Collections.swap(cityCards, i, j);
+                    Collections.swap(fundingValues, i, j);  // Swap the corresponding funding values as well
+                }
+            } else {
+                // Descending order
+                if (funding1 < funding2) {
+                    // Swap the cards
+                    Collections.swap(cityCards, i, j);
+                    Collections.swap(fundingValues, i, j);  // Swap the corresponding funding values as well
+                }
+            }
+        }
+    }
+}
+
     /**
      * Creates a panel containing key statistics.
      * @return JPanel containing statistics cards
      */
     private JPanel createModernStatsPanel() {
+        // Panel for holding statistics cards
         JPanel panel = new JPanel(new GridLayout(3, 1, 0, 20));
-        panel.setBackground(Color.WHITE);
+        panel.setBackground(Color.WHITE);    
         
         panel.add(createModernStatCard("$3.7 Billion", "Total Federal Funding Budget", "📊"));
         panel.add(createModernStatCard("39.8 Million", "Total Canadian Population", "👥"));
         panel.add(createModernStatCard("687,271", "Total New Homes Over 10 Years", ""));
-        
+    
         return panel;
     }
-    
+  
+     
     /**
      * Creates a card component for displaying a statistic.
      * @param value The numerical value or metric
@@ -482,6 +552,7 @@ public class View extends JFrame {
         return card;
     }
 
+
     /**
      * Creates a placeholder panel for upcoming features.
      * @return JPanel containing the "Coming Soon" message
@@ -508,54 +579,53 @@ public class View extends JFrame {
      * @param barValues List of values for bar graph
      * @return JPanel containing the dashboard content
      */
-    private JPanel createDashboardContent(List<String> cities, List<Integer> fundingValues, List<Float> pieData, List<String> pieLabels, List<String> barCategories, List<Integer> barValues) {
-        // Get provincial data from controller
+    private JPanel createDashboardContent(List<String> cityNames, List<Integer> fundingValues, List<Float> pieData, List<String> pieLabels, List<String> otherLabels, List<Integer> otherData) {
         DataController controller = viewHandler.getControllersList().get(0);
         Map<String, Integer> provincialFunding = controller.getProvincialFunding();
-        
-        // Convert to lists for charts
+
         List<String> provinceLabels = new ArrayList<>();
-        List<Float> pieFunding = new ArrayList<>();
         List<Integer> barFunding = new ArrayList<>();
-        
-        // Convert funding values to millions and add to lists
+        List<Float> pieFunding = new ArrayList<>();
+
         for (Map.Entry<String, Integer> entry : provincialFunding.entrySet()) {
             provinceLabels.add(entry.getKey());
-            pieFunding.add(entry.getValue().floatValue());
             barFunding.add(entry.getValue());
+            pieFunding.add(entry.getValue().floatValue());
         }
-        
+
         JPanel contentPanel = new JPanel(new BorderLayout(20, 20));
         contentPanel.setBackground(Color.WHITE);
-        
-        // Create left panel for city list
+
+        // Left panel for cities
         JPanel citiesPanel = createModernCityList();
         citiesPanel.setPreferredSize(new Dimension(350, 0));
-        citiesPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        
-        // Create right panel for charts and stats
+        contentPanel.add(citiesPanel, BorderLayout.WEST);
+
+        // Right panel for graphs
         JPanel rightPanel = new JPanel(new GridLayout(1, 2, 20, 0));
         rightPanel.setBackground(Color.WHITE);
-        
-        // Create charts panel with vertical layout
+
+        // Graphs section
         JPanel chartsPanel = new JPanel(new GridLayout(2, 1, 0, 20));
         chartsPanel.setBackground(Color.WHITE);
-        
-        // Add charts with provincial data
-        JPanel pieChartCard = createCard(new PieChart(pieFunding, provinceLabels), "Provincial Funding Distribution");
+
+        // Adding graphs using polymorphism
+        Graph pieChart = new PieChart(pieFunding, provinceLabels);
+        Graph barGraph = new BarGraph(provinceLabels, barFunding);
+
+        JPanel pieChartCard = createCard(pieChart, "Provincial Funding Distribution");
+        JPanel barGraphCard = createCard(barGraph, "Funding by Province");
+
         chartsPanel.add(pieChartCard);
-        
-        JPanel barGraphCard = createCard(new BarGraph(provinceLabels, barFunding), "Funding by Province");
         chartsPanel.add(barGraphCard);
-        
+
         rightPanel.add(chartsPanel);
-        
+
+        // Stats panel
         JPanel statsPanel = createModernStatsPanel();
         rightPanel.add(statsPanel);
-        
-        contentPanel.add(citiesPanel, BorderLayout.WEST);
+
         contentPanel.add(rightPanel, BorderLayout.CENTER);
-        
         return contentPanel;
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
  * gradients, and grid lines. It supports dynamic scaling based on data values
  * and panel size.
  */
-public class BarGraph extends JPanel {
+public class BarGraph extends Graph {
     /** List of category labels for the x-axis */
     private List<String> categories;
     
@@ -56,6 +56,15 @@ public class BarGraph extends JPanel {
     }
 
     /**
+     * Renders the graph.
+     * This triggers the repaint method, which calls paintComponent to redraw the graph.
+     */
+    @Override
+    public void renderGraph() {
+        repaint();
+    }
+
+    /**
      * Paints the bar graph component.
      * This method handles the rendering of:
      * - Grid lines and axis labels
@@ -68,7 +77,6 @@ public class BarGraph extends JPanel {
      */
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -94,11 +102,8 @@ public class BarGraph extends JPanel {
         drawAxesAndLabels(g2, width, height, padding);
     }
 
-    /**
-     * Draws the grid lines and corresponding y-axis labels.
-     */
     private void drawGridLinesAndLabels(Graphics2D g2, int width, int height, int padding, 
-                                      int labelPadding, int maxValue) {
+                                        int labelPadding, int maxValue) {
         int numGridLines = 5;
         for (int i = 0; i <= numGridLines; i++) {
             int y = height - padding - (int) (i * (height - 2 * padding) / (double) numGridLines);
@@ -113,12 +118,8 @@ public class BarGraph extends JPanel {
         }
     }
 
-    /**
-     * Draws the bars with gradients, value labels, and category labels.
-     */
     private void drawBarsAndLabels(Graphics2D g2, int width, int height, int padding, 
-                                 int labelPadding, double scale, int barWidth) {
-        // Use consistent font metrics
+                                   int labelPadding, double scale, int barWidth) {
         g2.setFont(new Font("Inter", Font.PLAIN, 11));
         FontMetrics metrics = g2.getFontMetrics();
         
@@ -127,7 +128,6 @@ public class BarGraph extends JPanel {
             int x = padding + i * barWidth;
             int y = height - padding - barHeight;
 
-            // Adjust bar width for better spacing
             int actualBarWidth = barWidth - 15;
             int barX = x + (barWidth - actualBarWidth) / 2;
 
@@ -141,7 +141,6 @@ public class BarGraph extends JPanel {
             g2.setPaint(gradient);
             g2.fillRect(barX, y, actualBarWidth, barHeight);
 
-            // Category label
             String category = categories.get(i);
             int labelWidth = metrics.stringWidth(category);
             g2.setColor(textColor);
@@ -149,19 +148,15 @@ public class BarGraph extends JPanel {
                          x + (barWidth - labelWidth)/2, 
                          height - padding + labelPadding/2);
 
-            // Value label
             g2.setFont(new Font("Inter", Font.BOLD, 12));
             String value = String.valueOf(values.get(i));
             labelWidth = metrics.stringWidth(value);
             g2.drawString(value, 
                          x + (barWidth - labelWidth)/2, 
-                         y - 8);  // Increased spacing above bar
+                         y - 8);
         }
     }
 
-    /**
-     * Draws the axes and their labels.
-     */
     private void drawAxesAndLabels(Graphics2D g2, int width, int height, int padding) {
         g2.setColor(axisColor);
         g2.setStroke(new BasicStroke(1.5f));
@@ -172,8 +167,14 @@ public class BarGraph extends JPanel {
         g2.setColor(textColor);
         g2.drawString("Categories", width / 2, height - 15);
         
-        // Rotate Y-axis label for better readability
         g2.rotate(-Math.PI / 2);
+        g2.drawString("Values", -height / 2, 25);
+        g2.rotate(Math.PI / 2);
+    }
+}
+        
+        // Rotate Y-axis label for better readability
+        g2.rotate(-Math.PI / 2)
         g2.drawString("Values", -height / 2, 25);
         g2.rotate(Math.PI / 2);
     }

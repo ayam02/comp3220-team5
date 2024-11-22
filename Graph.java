@@ -1,40 +1,47 @@
-public abstract class Graph {
-    private String x;
-    private String y;
-    private String description;
+import javax.swing.*;
+import java.awt.*;
 
+/**
+ * The Graph class serves as a base class for different types of graphs
+ * like PieChart and LineGraph. It provides common features and behaviors
+ * for graph visualization in a Swing application.
+ */
+public abstract class Graph extends JPanel {
+
+    /**
+     * Constructor to set up default configurations for the graph panel.
+     */
     public Graph() {
+        setBackground(Color.WHITE); // Default background color
     }
 
-    public Graph(String x, String y, String description) {
-        this.x = x;
-        this.y = y;
-        this.description = description;
-    }
+    /**
+     * Abstract method to be implemented by subclasses to draw the specific graph.
+     *
+     * @param g The Graphics object used for drawing
+     */
+    @Override
+    protected abstract void paintComponent(Graphics g);
 
-    public abstract void createGraph();
+    /**
+     * Abstract method to render the graph. Subclasses should implement this to
+     * trigger the repaint process, which will call paintComponent().
+     */
+    public abstract void renderGraph();
 
-    public void setX(String x) {
-        this.x = x;
-    }
-
-    public String getX() {
-        return x;
-    }
-
-    public void setY(String y) {
-        this.y = y;
-    }
-
-    public String getY() {
-        return y;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    /**
+     * Utility method to display the graph in a JFrame.
+     *
+     * @param title The title of the window
+     * @param width The width of the window
+     * @param height The height of the window
+     */
+    public void displayGraph(String title, int width, int height) {
+        JFrame frame = new JFrame(title);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(this);
+        frame.setSize(width, height);
+        frame.setLocationRelativeTo(null); // Center the window on the screen
+        frame.setVisible(true);
     }
 }
