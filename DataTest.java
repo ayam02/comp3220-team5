@@ -26,6 +26,10 @@ public class DataTest {
     public void testDefaultConstructor() {
         assertNotNull("Row list should not be null", data.getRow());
         assertTrue("Row list should initially be empty", data.getRow().isEmpty());
+
+        // Print statements for verification
+        System.out.println("Default Constructor Test:");
+        System.out.println("Row: " + data.getRow());
     }
 
     /**
@@ -40,6 +44,10 @@ public class DataTest {
         assertNotNull("Row list should not be null", parameterizedData.getRow());
         assertEquals("Row list should contain 1 entry", 1, parameterizedData.getRow().size());
         assertSame("First entry in the row should be mockEntry1", mockEntry1, parameterizedData.getRow().get(0));
+
+        // Print statements for verification
+        System.out.println("Parameterized Constructor Test:");
+        System.out.println("Row: " + parameterizedData.getRow());
     }
 
     /**
@@ -49,6 +57,10 @@ public class DataTest {
     public void testGetRow() {
         assertNotNull("Row list should not be null", data.getRow());
         assertTrue("Row list should initially be empty", data.getRow().isEmpty());
+
+        // Print statements for verification
+        System.out.println("Get Row Test:");
+        System.out.println("Row: " + data.getRow());
     }
 
     /**
@@ -64,6 +76,10 @@ public class DataTest {
         assertEquals("Row list should contain 2 entries", 2, data.getRow().size());
         assertSame("First entry should be mockEntry1", mockEntry1, data.getRow().get(0));
         assertSame("Second entry should be mockEntry2", mockEntry2, data.getRow().get(1));
+
+        // Print statements for verification
+        System.out.println("Set Row Test:");
+        System.out.println("Row: " + data.getRow());
     }
 
     /**
@@ -78,5 +94,9 @@ public class DataTest {
         assertEquals("Row list should contain 2 entries", 2, row.size());
         assertSame("First entry should be mockEntry1", mockEntry1, row.get(0));
         assertSame("Second entry should be mockEntry2", mockEntry2, row.get(1));
+
+        // Print statements for verification
+        System.out.println("Add To Row Test:");
+        System.out.println("Row: " + data.getRow());
     }
 }
