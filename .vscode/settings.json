@@ -1,3 +1,9 @@
 {
-    "java.debug.settings.onBuildFailureProceed": true
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.project.sourcePaths": [
+        "."
+    ],
+    "java.project.referencedLibraries": [
+        "/Users/bhabinpradhan/Downloads/comp3220/lib/junit-platform-console-standalone-1.11.3.jar"
+    ]
 }

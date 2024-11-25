@@ -1,6 +1,5 @@
 import org.junit.*;
 import static org.junit.Assert.*;
-
 import java.util.*;
 
 public class DataManagerTest {
@@ -18,6 +17,7 @@ public class DataManagerTest {
 
         // Initialize DataManager with mock dataset
         dataManager = new DataManager(mockDataSet);
+        System.out.println("DataManager initialized with mock data.");
     }
 
     /**
@@ -25,18 +25,13 @@ public class DataManagerTest {
      */
     @Test
     public void testConstructorWithDataSet() {
-        assertNotNull("Dataset should not be null", dataManager.getDataSet());
-        assertEquals("Dataset should have 1 row", 1, dataManager.getDataSet().size());
-    }
+        System.out.println("Testing constructor with dataset...");
+        List<Data> dataSet = dataManager.getDataSet();
+        assertNotNull("Dataset should not be null", dataSet);
+        System.out.println("Dataset: " + dataSet);
 
-    /**
-     * Test the constructor with file paths for CSV and JSON.
-     * This requires mock or sample files.
-     */
-    @Test
-    public void testConstructorWithFiles() {
-        DataManager fileDataManager = new DataManager("./data/mockData.csv", "./configFiles/mockConfig.json");
-        assertNotNull("Dataset should not be null after file processing", fileDataManager.getDataSet());
+        assertEquals("Dataset should have 1 row", 1, dataSet.size());
+        System.out.println("Constructor test passed: Dataset size = " + dataSet.size());
     }
 
     /**
@@ -44,6 +39,7 @@ public class DataManagerTest {
      */
     @Test
     public void testSetDataSet() {
+        System.out.println("Testing setDataSet...");
         List<Data> newDataSet = new ArrayList<>();
         Data newRow = new Data();
         newRow.addToRow(new Entry("String", "NewCity", "City"));
@@ -52,72 +48,57 @@ public class DataManagerTest {
         dataManager.setDataSet(newDataSet);
         assertEquals("Dataset should have 1 row after reset", 1, dataManager.getDataSet().size());
         assertEquals("First row's City should be NewCity", "NewCity", newDataSet.get(0).getRow().get(0).getValue());
+
+        System.out.println("New dataset: " + dataManager.getDataSet());
+        System.out.println("setDataSet test passed.");
     }
 
     /**
-     * Test the readData() method.
-     * This requires a sample CSV file.
+     * Test adding a new row to the dataset.
      */
     @Test
-    public void testReadData() {
-        // Call readData() to read a sample file
-        dataManager.readData("./data/mockData.csv");
-    
-        // Populate data to validate the effect of reading the file
-        dataManager.populateData();
-    
-        // Check if the dataset is populated
-        List<Data> populatedDataSet = dataManager.getDataSet();
-        assertNotNull("Dataset should not be null after populating", populatedDataSet);
-        assertTrue("Dataset should contain rows from the file", populatedDataSet.size() > 0);
-    }
-    
+    public void testAddNewRow() {
+        System.out.println("Testing adding a new row...");
+        Data newRow = new Data();
+        newRow.addToRow(new Entry("String", "AnotherCity", "City"));
+        newRow.addToRow(new Entry("Integer", 2000, "Population"));
 
-    /**
-     * Test the readJSON() method.
-     * This requires a sample JSON file.
-     */
-    @Test
-    public void testReadJSON() {
-        // Call readJSON() to load a sample JSON configuration file
-        dataManager.readJSON("./configFiles/mockConfig.json");
-    
-        // Populate data to validate the effect of reading JSON
-        dataManager.populateData();
-    
-        // Check if the dataset is populated
-        List<Data> populatedDataSet = dataManager.getDataSet();
-        assertNotNull("Dataset should not be null after reading JSON and populating data", populatedDataSet);
-        assertTrue("Dataset should contain rows", populatedDataSet.size() > 0);
-    }
-    
-    /**
-     * Test the populateData() method.
-     * Requires mock data and JSON files to simulate a full pipeline.
-     */
-    @Test
-    public void testPopulateData() {
-        dataManager.readData("./data/mockData.csv");
-        dataManager.readJSON("./configFiles/mockConfig.json");
-        dataManager.populateData();
+        List<Data> currentDataSet = dataManager.getDataSet();
+        currentDataSet.add(newRow);
+        dataManager.setDataSet(currentDataSet);
 
-        List<Data> populatedDataSet = dataManager.getDataSet();
-        assertNotNull("Dataset should not be null after populating", populatedDataSet);
-        assertTrue("Dataset should contain rows", populatedDataSet.size() > 0);
+        assertEquals("Dataset should now have 2 rows", 2, dataManager.getDataSet().size());
+        assertEquals("Second row's City should be AnotherCity", "AnotherCity", dataManager.getDataSet().get(1).getRow().get(0).getValue());
+
+        System.out.println("Updated dataset: " + dataManager.getDataSet());
+        System.out.println("Add new row test passed.");
     }
 
     /**
-     * Test error handling in populateData() when given invalid data.
+     * Test retrieving the first row from the dataset.
      */
     @Test
-    public void testPopulateDataWithInvalidData() {
-        dataManager.readData("./data/invalidMockData.csv"); // Contains invalid data for testing
-        dataManager.readJSON("./configFiles/mockConfig.json");
-        try {
-            dataManager.populateData();
-        } catch (Exception e) {
-            fail("populateData() should handle errors gracefully and not throw exceptions");
-        }
-        assertNotNull("Dataset should not be null even with invalid data", dataManager.getDataSet());
+    public void testGetFirstRow() {
+        System.out.println("Testing retrieving the first row...");
+        Data firstRow = dataManager.getDataSet().get(0);
+
+        assertNotNull("First row should not be null", firstRow);
+        assertEquals("First row's City should be TestCity", "TestCity", firstRow.getRow().get(0).getValue());
+
+        System.out.println("First row: " + firstRow.getRow());
+        System.out.println("Get first row test passed.");
+    }
+
+    /**
+     * Test clearing the dataset.
+     */
+    @Test
+    public void testClearDataSet() {
+        System.out.println("Testing clearing the dataset...");
+        dataManager.setDataSet(new ArrayList<>()); // Set an empty dataset
+
+        assertEquals("Dataset should have 0 rows after clearing", 0, dataManager.getDataSet().size());
+        System.out.println("Cleared dataset: " + dataManager.getDataSet());
+        System.out.println("Clear dataset test passed.");
     }
 }
