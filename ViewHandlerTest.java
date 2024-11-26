@@ -1,75 +1,89 @@
 import org.junit.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class ViewHandlerTest {
     private ViewHandler viewHandler;
+    private DataController dummyController1;
+    private DataController dummyController2;
 
+    /**
+     * Sets up a fresh ViewHandler instance and dummy controllers before each test.
+     */
     @Before
     public void setUp() {
-        // Initialize ViewHandler
-        viewHandler = new ViewHandler();
-        System.out.println("ViewHandler initialized successfully.");
+        viewHandler = new ViewHandler(); // Initialize ViewHandler
+
+        // Create dummy DataController objects
+        dummyController1 = new DataController("dummyPath1", "dummyConfig1");
+        dummyController2 = new DataController("dummyPath2", "dummyConfig2");
     }
 
     /**
-     * Test default constructor initializes an empty controllers list.
+     * Tests the default constructor to ensure the controllers list is initialized as empty.
      */
     @Test
     public void testDefaultConstructor() {
-        System.out.println("Testing default constructor...");
         assertNotNull("Controllers list should not be null", viewHandler.getControllersList());
         assertTrue("Controllers list should initially be empty", viewHandler.getControllersList().isEmpty());
-        System.out.println("Default constructor test passed. Controllers list is empty.");
     }
 
     /**
-     * Test getFileNames() for a known button.
+     * Tests adding a single controller to the controllers list.
      */
     @Test
-    public void testGetFileNames() {
-        System.out.println("Testing getFileNames for 'Funding Insights'...");
-        String[] files = viewHandler.getFileNames("Funding Insights");
+    public void testAddController() {
+        viewHandler.addController(dummyController1);
+        List<DataController> controllers = viewHandler.getControllersList();
 
-        assertNotNull("File names array should not be null", files);
-        assertEquals("Dataset path should match expected value", "./data/csv/Funding.csv", files[0]);
-        assertEquals("Config path should match expected value", "./configFiles/FundingConfig.json", files[1]);
-
-        System.out.println("File names for 'Funding Insights':");
-        System.out.println("Dataset Path: " + files[0]);
-        System.out.println("Config Path: " + files[1]);
+        assertEquals("Controllers list should contain 1 item", 1, controllers.size());
+        assertSame("First item in list should be dummyController1", dummyController1, controllers.get(0));
     }
 
     /**
-     * Test getFileNames() for a valid button with expected output.
+     * Tests adding multiple controllers to the controllers list.
      */
     @Test
-    public void testGetFileNamesForValidButton() {
-        System.out.println("Testing getFileNames for a valid button...");
-        String[] files = viewHandler.getFileNames("Funding Insights");
+    public void testAddMultipleControllers() {
+        viewHandler.addController(dummyController1);
+        viewHandler.addController(dummyController2);
+        List<DataController> controllers = viewHandler.getControllersList();
 
-        assertNotNull("File names array should not be null", files);
-        assertEquals("First file should match expected path", "./data/csv/Funding.csv", files[0]);
-        assertEquals("Second file should match expected path", "./configFiles/FundingConfig.json", files[1]);
-
-        System.out.println("Valid button file names:");
-        System.out.println("Dataset Path: " + files[0]);
-        System.out.println("Config Path: " + files[1]);
+        assertEquals("Controllers list should contain 2 items", 2, controllers.size());
+        assertSame("First item should be dummyController1", dummyController1, controllers.get(0));
+        assertSame("Second item should be dummyController2", dummyController2, controllers.get(1));
     }
 
     /**
-     * Test getFileNames() for an invalid button with default empty values.
+     * Tests setting a new controllers list.
      */
     @Test
-    public void testGetFileNamesForInvalidButton() {
-        System.out.println("Testing getFileNames for an invalid button...");
-        String[] files = viewHandler.getFileNames("Invalid Button");
+    public void testSetControllersList() {
+        List<DataController> newList = new ArrayList<>();
+        newList.add(dummyController1);
+        newList.add(dummyController2);
 
-        assertNotNull("File names array should not be null", files);
-        assertEquals("First file should be an empty string", "", files[0]);
-        assertEquals("Second file should be an empty string", "", files[1]);
+        viewHandler.setControllersList(newList);
+        List<DataController> controllers = viewHandler.getControllersList();
 
-        System.out.println("Invalid button file names:");
-        System.out.println("Dataset Path: " + files[0]);
-        System.out.println("Config Path: " + files[1]);
+        assertEquals("Controllers list should contain 2 items", 2, controllers.size());
+        assertSame("First item should be dummyController1", dummyController1, controllers.get(0));
+        assertSame("Second item should be dummyController2", dummyController2, controllers.get(1));
+    }
+
+    /**
+     * Tests replacing the controllers list with an empty list.
+     */
+    @Test
+    public void testSetEmptyControllersList() {
+        List<DataController> emptyList = new ArrayList<>();
+
+        viewHandler.setControllersList(emptyList);
+        List<DataController> controllers = viewHandler.getControllersList();
+
+        assertNotNull("Controllers list should not be null after replacement", controllers);
+        assertTrue("Controllers list should be empty", controllers.isEmpty());
     }
 }
