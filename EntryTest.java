@@ -1,14 +1,16 @@
-
 import org.junit.*;
-
-
 import static org.junit.Assert.*;
 
+/**
+ * This class contains unit tests for the {@code Entry} class, ensuring that all methods and constructors behave as expected.
+ * The tests validate functionality such as setting and retrieving fields, values, and types, handling null and empty inputs,
+ * and formatting output via {@code toString()}.
+ */
 public class EntryTest {
     private Entry entry;
 
     /**
-     * Sets up a fresh Entry instance before each test.
+     * Sets up a fresh {@code Entry} instance before each test.
      */
     @Before
     public void setUp() {
@@ -16,7 +18,7 @@ public class EntryTest {
     }
 
     /**
-     * Tests the default constructor to ensure all fields are null.
+     * Tests the default constructor to ensure all fields are initialized to {@code null}.
      */
     @Test
     public void testDefaultConstructor() {
@@ -24,15 +26,15 @@ public class EntryTest {
         assertNull("Type should be null", entry.getType());
         assertNull("Value should be null", entry.getValue());
 
-          // Print statements for verification
-          System.out.println("Default Constructor Test:");
-          System.out.println("Field: " + entry.getField());
-          System.out.println("Type: " + entry.getType());
-          System.out.println("Value: " + entry.getValue());
+        // Print statements for verification
+        System.out.println("Default Constructor Test:");
+        System.out.println("Field: " + entry.getField());
+        System.out.println("Type: " + entry.getType());
+        System.out.println("Value: " + entry.getValue());
     }
 
     /**
-     * Tests the parameterized constructor to ensure fields are correctly set.
+     * Tests the parameterized constructor to ensure fields are correctly set upon initialization.
      */
     @Test
     public void testParameterizedConstructor() {
@@ -41,15 +43,15 @@ public class EntryTest {
         assertEquals("Value should be Hello", "Hello", parameterizedEntry.getValue());
         assertEquals("Field should be greeting", "greeting", parameterizedEntry.getField());
 
-         // Print statements for verification
-         System.out.println("Parameterized Constructor Test:");
-         System.out.println("Field: " + parameterizedEntry.getField());
-         System.out.println("Type: " + parameterizedEntry.getType());
-         System.out.println("Value: " + parameterizedEntry.getValue());
+        // Print statements for verification
+        System.out.println("Parameterized Constructor Test:");
+        System.out.println("Field: " + parameterizedEntry.getField());
+        System.out.println("Type: " + parameterizedEntry.getType());
+        System.out.println("Value: " + parameterizedEntry.getValue());
     }
 
     /**
-     * Tests the setField() and getField() methods.
+     * Tests the {@code setField()} and {@code getField()} methods.
      */
     @Test
     public void testSetAndGetField() {
@@ -60,24 +62,25 @@ public class EntryTest {
         System.out.println("Set and Get Field Test:");
         System.out.println("Field: " + entry.getField());
     }
+
     /**
-     * Tests the setType() and getType() methods.
+     * Tests the {@code setType()} and {@code getType()} methods.
      */
     @Test
     public void testSetAndGetType() {
         entry.setType("INTEGER");
         assertEquals("Type should be INTEGER", "INTEGER", entry.getType());
-        
+
         // Print statements for verification
         System.out.println("Set and Get Type Test:");
         System.out.println("Type: " + entry.getType());
     }
 
     /**
-     * Tests the setValue() and getValue() methods with different data types.
+     * Tests the {@code setValue()} and {@code getValue()} methods with different data types.
      */
     @Test
-    public void testSetAndGetValue(){
+    public void testSetAndGetValue() {
         // Test with a String
         entry.setValue("TestString");
         assertEquals("Value should be TestString", "TestString", entry.getValue());
@@ -98,7 +101,7 @@ public class EntryTest {
     }
 
     /**
-     * Tests the toString() method to ensure it returns the expected format.
+     * Tests the {@code toString()} method to ensure it returns the expected format.
      */
     @Test
     public void testToString() {
@@ -107,44 +110,46 @@ public class EntryTest {
         entry.setValue(25);
         String expected = "age = 25 is of type: INTEGER";
         assertEquals("toString() output should match expected format", expected, entry.toString());
-    
+
         // Print statements for verification
         System.out.println("ToString Test:");
         System.out.println("toString: " + entry.toString());
     }
 
     /**
-     * Tests the null values
+     * Tests the behavior of the {@code Entry} class when null values are set for fields, types, and values.
      */
     @Test
     public void testSetNullValues() {
         entry.setField(null);
-        assertNull(entry.getField());
+        assertNull("Field should be null", entry.getField());
         System.out.println("Set Null Field Test:");
         System.out.println("Field: " + entry.getField());
 
         entry.setType(null);
-        assertNull(entry.getType());
+        assertNull("Type should be null", entry.getType());
         System.out.println("Set Null Type Test:");
         System.out.println("Type: " + entry.getType());
 
         entry.setValue(null);
-        assertNull(entry.getValue());
+        assertNull("Value should be null", entry.getValue());
         System.out.println("Set Null Value Test:");
         System.out.println("Value: " + entry.getValue());
     }
 
-   @Test
-    public void testEmptyStrings(){
+    /**
+     * Tests the behavior of the {@code Entry} class when empty strings are set for fields and types.
+     */
+    @Test
+    public void testEmptyStrings() {
         entry.setField("");
-        assertEquals("", entry.getField());
+        assertEquals("Field should be an empty string", "", entry.getField());
         System.out.println("Set Empty Field Test:");
         System.out.println("Field: " + entry.getField());
 
         entry.setType("");
-        assertEquals("", entry.getType());
+        assertEquals("Type should be an empty string", "", entry.getType());
         System.out.println("Set Empty Type Test:");
         System.out.println("Type: " + entry.getType());
     }
-
 }

@@ -4,13 +4,19 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Unit tests for the {@link Data} class.
+ * This class uses JUnit to test the functionality of the {@link Data} class,
+ * including its constructors, getters, and methods for manipulating the row list.
+ */
 public class DataTest {
     private Data data;
     private Entry mockEntry1;
     private Entry mockEntry2;
 
     /**
-     * Sets up a fresh Data instance and mock entries before each test.
+     * Sets up a fresh {@link Data} instance and mock {@link Entry} objects
+     * before each test is executed.
      */
     @Before
     public void setUp() {
@@ -20,7 +26,8 @@ public class DataTest {
     }
 
     /**
-     * Tests the default constructor to ensure the row list is initialized as empty.
+     * Tests the default constructor to ensure that the row list is
+     * initialized as an empty {@link List}.
      */
     @Test
     public void testDefaultConstructor() {
@@ -33,7 +40,8 @@ public class DataTest {
     }
 
     /**
-     * Tests the parameterized constructor to ensure it initializes the row list correctly.
+     * Tests the parameterized constructor to ensure that it initializes
+     * the row list correctly with a given {@link List} of {@link Entry} objects.
      */
     @Test
     public void testParameterizedConstructor() {
@@ -51,7 +59,7 @@ public class DataTest {
     }
 
     /**
-     * Tests the getRow() method.
+     * Tests the {@link Data#getRow()} method to ensure it returns the correct row list.
      */
     @Test
     public void testGetRow() {
@@ -64,7 +72,8 @@ public class DataTest {
     }
 
     /**
-     * Tests the setRow() method.
+     * Tests the {@link Data#setRow(List)} method to ensure it correctly
+     * updates the row list.
      */
     @Test
     public void testSetRow() {
@@ -83,7 +92,8 @@ public class DataTest {
     }
 
     /**
-     * Tests the addToRow() method.
+     * Tests the {@link Data#addToRow(Entry)} method to ensure it correctly
+     * appends entries to the row list.
      */
     @Test
     public void testAddToRow() {
