@@ -11,11 +11,14 @@ import java.util.HashMap;
 
 /**
  * A Swing-based view component that creates a modern dashboard interface for housing data visualization.
- * This class extends JFrame and implements a responsive UI with a sidebar navigation, charts, and statistics.
+ * This class extends JFrame and implements a responsive UI with a sidebar navigation, interactive map,
+ * and data visualization components.
  */
 public class View extends JFrame {
 
-    // Inner class for RoundedBorder
+    /**
+     * Custom border implementation that creates rounded corners with a specified color.
+     */
     private static class RoundedBorder extends AbstractBorder {
         private int radius;
         private Color color;
@@ -30,6 +33,7 @@ public class View extends JFrame {
             this.color = color;
         }
 
+        @Override
         public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -38,61 +42,59 @@ public class View extends JFrame {
             g2d.dispose();
         }
 
+        @Override
         public Insets getBorderInsets(Component c) {
             return new Insets(radius/2, radius/2, radius/2, radius/2);
         }
     }
 
+    // Instance variables with clear purpose
     private JPanel mainContent;
     private CardLayout cardLayout;
     private JPanel contentCards;
-    private List<JPanel> navItems = new ArrayList<>();
+    private List<JPanel> navItems;
     private JLabel headerTitle;
     private ViewHandler viewHandler;
-    private JPanel mapPanel; // Placeholder for the map
-    private JPanel graphPanel; // Panel for the graph and stats
-    private JButton toggleButton; // Button to toggle between map and graph
-    private JPanel cityInfoPanel; // Panel to display city information
-    private boolean isShowingMap = true;  // Track current view state
+    private JPanel mapPanel;
+    private JPanel graphPanel;
+    private JButton toggleButton;
+    private JPanel cityInfoPanel;
+    private boolean isShowingMap;
 
     /**
-     * Constructs a new View with the specified data for visualization.
-     * @param viewHandler The ViewHandler instance
+     * Constructs a new View with the specified ViewHandler for data management.
+     * Initializes the UI components and loads initial data for visualization.
+     * 
+     * @param viewHandler The ViewHandler instance managing data controllers
      */
     public View(ViewHandler viewHandler) {
         this.viewHandler = viewHandler;
         this.navItems = new ArrayList<>();
         
-        // Get initial data
         DataController controller = viewHandler.getController("Funding Insights");
         List<String> cities = controller.getCityNames();
         List<Integer> fundingValues = controller.getFundingValues();
         
-        // Set up the GUI
         createAndShowGUI(cities, fundingValues);
         setupFrame();
-        
-        // Trigger initial data load
         updateMapAndGraphViews(controller, true);
     }
-    
+
     /**
      * Attempts to register the Inter font for use in the application.
      * Falls back to system fonts if the Inter font is not available.
      */
     private void registerFont() {
         try {
-            // Try to register the Inter font if it exists in the system
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("path/to/Inter.ttf")));
         } catch (Exception e) {
-            // If Inter font is not available, fall back to system fonts
             System.out.println("Inter font not available, using system fonts");
         }
     }
     
     /**
-     * Creates the modern sidebar navigation panel.
+     * Creates the modern sidebar navigation panel with logo and navigation items.
      * @return JPanel containing the sidebar with logo and navigation items
      */
     private JPanel createModernSidebar() {
@@ -102,10 +104,9 @@ public class View extends JFrame {
         sidebar.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         sidebar.setPreferredSize(new Dimension(250, 0));
         
-        // Create a wrapper panel for the logo with FlowLayout.LEFT
         JPanel logoWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         logoWrapper.setBackground(new Color(245, 247, 250));
-        logoWrapper.setMaximumSize(new Dimension(250, 35));  // Control the height
+        logoWrapper.setMaximumSize(new Dimension(250, 35));
         
         JLabel logo = new JLabel("OpenHome");
         logo.setFont(new Font("Inter", Font.BOLD, 24));
@@ -114,7 +115,6 @@ public class View extends JFrame {
         sidebar.add(logoWrapper);
         sidebar.add(Box.createVerticalStrut(40));
         
-        // Add modern nav items
         addModernNavItem(sidebar, "Federal Housing Funds", true);
         addModernNavItem(sidebar, "Future Housing Plan", false);
         addModernNavItem(sidebar, "Housing Initiatives", false);
@@ -124,7 +124,7 @@ public class View extends JFrame {
     }
     
     /**
-     * Adds a navigation item to the sidebar.
+     * Adds a navigation item to the sidebar with specified properties.
      * @param sidebar The sidebar panel to add the item to
      * @param text The text label for the navigation item
      * @param selected Whether this item should be initially selected
@@ -248,8 +248,7 @@ public class View extends JFrame {
         // Show map view by default
         cardLayout.show(contentCards, "Map View");
         
-        // Update the bounds of the main content to accommodate the toggle button
-        mainContent.setBounds(250, 0, 950, 800 - 30); // Adjust height to account for toggle button
+        mainContent.setBounds(250, 0, 950, 800 - 30);
         
         header.add(titlePanel, BorderLayout.WEST);
         
@@ -333,29 +332,29 @@ public class View extends JFrame {
     }
      
     /**
- * Helper method to rebuild the city list after sorting.
- */
-private void rebuildCityList(JPanel listPanel, JPanel sortPanel, List<JPanel> cityCards) {
-    listPanel.removeAll();
-    listPanel.add(sortPanel);
-    listPanel.add(Box.createVerticalStrut(15)); // Re-add space after the Sort buttons
-    for (JPanel cityCard : cityCards) {
-        listPanel.add(cityCard);
-        listPanel.add(Box.createVerticalStrut(15));
-    }
+     * Helper method to rebuild the city list after sorting.
+     */
+    private void rebuildCityList(JPanel listPanel, JPanel sortPanel, List<JPanel> cityCards) {
+        listPanel.removeAll();
+        listPanel.add(sortPanel);
+        listPanel.add(Box.createVerticalStrut(15)); // Re-add space after the Sort buttons
+        for (JPanel cityCard : cityCards) {
+            listPanel.add(cityCard);
+            listPanel.add(Box.createVerticalStrut(15));
+        }
 
-    // Refresh the view
-    listPanel.revalidate();
-    listPanel.repaint();
-}
+        // Refresh the view
+        listPanel.revalidate();
+        listPanel.repaint();
+    }
 
     
      
     /**
      * Creates a card component for displaying city information.
      * @param city The name of the city
-     * @param value The funding amount for the city
-     * @return JPanel containing the city card
+     * @param value The value to display (funding amount or housing units)
+     * @return JPanel containing the styled city card
      */
     private JPanel createModernCityCard(String city, String value) {
         JPanel card = new JPanel(new BorderLayout(10, 5));
@@ -775,143 +774,155 @@ private void rebuildCityList(JPanel listPanel, JPanel sortPanel, List<JPanel> ci
         });
     }
 
-private void displayCityInfo(String cityName) {
-    // Get data from controller
-    DataController controller = viewHandler.getControllersList().get(0);
-    List<String> cities = controller.getCityNames();
-    
-    // Determine which data to display based on selected tab
-    List<Integer> values;
-    String valuePrefix;
-    if (headerTitle.getText().contains("Federal Funding")) {
-        values = controller.getFundingValues();
-        valuePrefix = "$";
-    } else {
-        values = controller.getFutureHousingPlans();
-        valuePrefix = "";
-    }
-
-    // Find the index of the city based on the first word
-    String[] cityNameParts = cityName.split(" ");
-    String firstWord = cityNameParts[0];
-
-    int index = -1;
-    for (int i = 0; i < cities.size(); i++) {
-        if (cities.get(i).startsWith(firstWord)) {
-            index = i;
-            break;
-        }
-    }
-
-    // Create the card layout
-    JPanel card = new JPanel(new BorderLayout(5, 0));
-    card.setBackground(new Color(250, 252, 255));
-    card.setBorder(BorderFactory.createCompoundBorder(
-        new RoundedBorder(10, new Color(230, 230, 230)),
-        BorderFactory.createEmptyBorder(5, 10, 5, 10)
-    ));
-
-    // Create a more compact layout for the text
-    JPanel textPanel = new JPanel(new GridLayout(3, 1, 0, 0));
-    textPanel.setBackground(new Color(250, 252, 255));
-
-    // Add population emoji label
-    JLabel populationLabel = new JLabel("👥");
-    populationLabel.setFont(new Font("Inter", Font.PLAIN, 30));
-    populationLabel.setHorizontalAlignment(SwingConstants.LEFT);
-
-    // Create labels with specified font sizes
-    JLabel cityLabel = new JLabel(cityName);
-    cityLabel.setFont(new Font("Inter", Font.BOLD, 18));
-    
-    JLabel fundingLabel;
-    if (index != -1) {
-        String valueText;
+    /**
+     * Displays information for a selected city on the map.
+     * @param cityName The name of the city to display information for
+     */
+    private void displayCityInfo(String cityName) {
+        // Get data from controller
+        DataController controller = viewHandler.getControllersList().get(0);
+        List<String> cities = controller.getCityNames();
+        
+        // Determine which data to display based on selected tab
+        List<Integer> values;
+        String valuePrefix;
         if (headerTitle.getText().contains("Federal Funding")) {
-            valueText = valuePrefix + values.get(index) + " Million";
+            values = controller.getFundingValues();
+            valuePrefix = "$";
         } else {
-            valueText = values.get(index) + " New Homes";
+            values = controller.getFutureHousingPlans();
+            valuePrefix = "";
         }
-        fundingLabel = new JLabel(valueText);
-    } else {
-        fundingLabel = new JLabel("No Info available");
+
+        // Find the index of the city based on the first word
+        String[] cityNameParts = cityName.split(" ");
+        String firstWord = cityNameParts[0];
+
+        int index = -1;
+        for (int i = 0; i < cities.size(); i++) {
+            if (cities.get(i).startsWith(firstWord)) {
+                index = i;
+                break;
+            }
+        }
+
+        // Create the card layout
+        JPanel card = new JPanel(new BorderLayout(5, 0));
+        card.setBackground(new Color(250, 252, 255));
+        card.setBorder(BorderFactory.createCompoundBorder(
+            new RoundedBorder(10, new Color(230, 230, 230)),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+
+        // Create a more compact layout for the text
+        JPanel textPanel = new JPanel(new GridLayout(3, 1, 0, 0));
+        textPanel.setBackground(new Color(250, 252, 255));
+
+        // Add population emoji label
+        JLabel populationLabel = new JLabel("👥");
+        populationLabel.setFont(new Font("Inter", Font.PLAIN, 30));
+        populationLabel.setHorizontalAlignment(SwingConstants.LEFT);
+
+        // Create labels with specified font sizes
+        JLabel cityLabel = new JLabel(cityName);
+        cityLabel.setFont(new Font("Inter", Font.BOLD, 18));
+        
+        JLabel fundingLabel;
+        if (index != -1) {
+            String valueText;
+            if (headerTitle.getText().contains("Federal Funding")) {
+                valueText = valuePrefix + values.get(index) + " Million";
+            } else {
+                valueText = values.get(index) + " New Homes";
+            }
+            fundingLabel = new JLabel(valueText);
+        } else {
+            fundingLabel = new JLabel("No Info available");
+        }
+        
+        fundingLabel.setFont(new Font("Inter", Font.BOLD, 24));
+        fundingLabel.setForeground(Color.GRAY);
+
+        textPanel.add(populationLabel);
+        textPanel.add(cityLabel);
+        textPanel.add(fundingLabel);
+        card.add(textPanel, BorderLayout.CENTER);
+
+        // Clear previous content and add new city card
+        cityInfoPanel.removeAll();
+        cityInfoPanel.add(card, BorderLayout.CENTER);
+        cityInfoPanel.revalidate();
+        cityInfoPanel.repaint();
     }
-    
-    fundingLabel.setFont(new Font("Inter", Font.BOLD, 24));
-    fundingLabel.setForeground(Color.GRAY);
 
-    textPanel.add(populationLabel);
-    textPanel.add(cityLabel);
-    textPanel.add(fundingLabel);
-    card.add(textPanel, BorderLayout.CENTER);
+    /**
+     * Creates and initializes the main GUI components.
+     * @param cities List of city names to display
+     * @param fundingValues List of funding values corresponding to the cities
+     */
+    private void createAndShowGUI(List<String> cities, List<Integer> fundingValues) {
+        // Initialize card layout
+        cardLayout = new CardLayout();
+        contentCards = new JPanel(cardLayout);
+        contentCards.setBackground(Color.WHITE);
+        
+        // Create sidebar
+        JPanel sidebar = createModernSidebar();
+        
+        // Create main content
+        mainContent = new JPanel(new BorderLayout(20, 20));
+        mainContent.setBackground(Color.WHITE);
+        mainContent.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        // Create header
+        JPanel headerPanel = createModernHeader();
+        
+        // Initialize city info panel
+        cityInfoPanel = new JPanel(new BorderLayout());
+        cityInfoPanel.setBackground(Color.WHITE);
+        cityInfoPanel.setBounds(875, 70, 300, 200);
+        displayDefaultCityInfo();
+        
+        // Create initial panels
+        mapPanel = createMapPanel();
+        
+        // Initialize with Federal Funding data
+        DataController controller = viewHandler.getController("Funding Insights");
+        updateMapAndGraphViews(controller, true);  // true for Federal Funding
+        
+        JPanel comingSoonPanel = createComingSoonPanel();
+        
+        // Add panels to card layout
+        contentCards.add(mapPanel, "Map View");
+        contentCards.add(graphPanel, "Graph View");
+        contentCards.add(comingSoonPanel, "Coming Soon");
+        
+        // Add components to main content
+        mainContent.add(headerPanel, BorderLayout.NORTH);
+        mainContent.add(contentCards, BorderLayout.CENTER);
+        
+        // Set layout to null for absolute positioning
+        setLayout(null);
+        add(sidebar);
+        add(mainContent);
+        add(cityInfoPanel);
+        
+        // Set bounds for other components
+        sidebar.setBounds(0, 0, 250, 800);
+        mainContent.setBounds(250, 0, 960, 810);
 
-    // Clear previous content and add new city card
-    cityInfoPanel.removeAll();
-    cityInfoPanel.add(card, BorderLayout.CENTER);
-    cityInfoPanel.revalidate();
-    cityInfoPanel.repaint();
-}
+        
+        // Debugging output
+        System.out.println("Initial Toggle Button Text: " + toggleButton.getText());
+        
+        // Show map view by default
+        cardLayout.show(contentCards, "Map View");
+    }
 
-
-private void createAndShowGUI(List<String> cities, List<Integer> fundingValues) {
-    // Initialize card layout
-    cardLayout = new CardLayout();
-    contentCards = new JPanel(cardLayout);
-    contentCards.setBackground(Color.WHITE);
-    
-    // Create sidebar
-    JPanel sidebar = createModernSidebar();
-    
-    // Create main content
-    mainContent = new JPanel(new BorderLayout(20, 20));
-    mainContent.setBackground(Color.WHITE);
-    mainContent.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-    
-    // Create header
-    JPanel headerPanel = createModernHeader();
-    
-    // Initialize city info panel
-    cityInfoPanel = new JPanel(new BorderLayout());
-    cityInfoPanel.setBackground(Color.WHITE);
-    cityInfoPanel.setBounds(875, 70, 300, 200);
-    displayDefaultCityInfo();
-    
-    // Create initial panels
-    mapPanel = createMapPanel();
-    
-    // Initialize with Federal Funding data
-    DataController controller = viewHandler.getController("Funding Insights");
-    updateMapAndGraphViews(controller, true);  // true for Federal Funding
-    
-    JPanel comingSoonPanel = createComingSoonPanel();
-    
-    // Add panels to card layout
-    contentCards.add(mapPanel, "Map View");
-    contentCards.add(graphPanel, "Graph View");
-    contentCards.add(comingSoonPanel, "Coming Soon");
-    
-    // Add components to main content
-    mainContent.add(headerPanel, BorderLayout.NORTH);
-    mainContent.add(contentCards, BorderLayout.CENTER);
-    
-    // Set layout to null for absolute positioning
-    setLayout(null);
-    add(sidebar);
-    add(mainContent);
-    add(cityInfoPanel);
-    
-    // Set bounds for other components
-    sidebar.setBounds(0, 0, 250, 800);
-    mainContent.setBounds(250, 0, 960, 810);
-
-    
-    // Debugging output
-    System.out.println("Initial Toggle Button Text: " + toggleButton.getText());
-    
-    // Show map view by default
-    cardLayout.show(contentCards, "Map View");
-}
-
+    /**
+     * Updates the display with new data from the controller.
+     * This method refreshes both the city list and chart displays.
+     */
     public void updateDisplay() {
         DataController controller = viewHandler.getControllersList().get(0);
         List<String> cities = controller.getCityNames();
@@ -932,8 +943,11 @@ private void createAndShowGUI(List<String> cities, List<Integer> fundingValues) 
         mainContent.repaint();
     }
 
+    /**
+     * Sets up the main application frame with default properties.
+     */
     private void setupFrame() {
-        setTitle("Canadian Housing Dashboard");
+        setTitle("OpenHome");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setSize(1200, 800);
@@ -984,6 +998,11 @@ private void createAndShowGUI(List<String> cities, List<Integer> fundingValues) 
         return chartsPanel;
     }
 
+    /**
+     * Updates the map and graph views with new data from the controller.
+     * @param controller The data controller providing the information
+     * @param isFunding True if displaying funding data, false if displaying housing plans
+     */
     private void updateMapAndGraphViews(DataController controller, boolean isFunding) {
         List<String> cities = controller.getCityNames();
         List<Integer> values;
@@ -1044,6 +1063,9 @@ private void createAndShowGUI(List<String> cities, List<Integer> fundingValues) 
         contentCards.repaint();
     }
 
+    /**
+     * Displays default information in the city info panel when no city is selected.
+     */
     private void displayDefaultCityInfo() {
         JPanel card = new JPanel(new BorderLayout(5, 0));
         card.setBackground(new Color(250, 252, 255));
@@ -1086,6 +1108,12 @@ private void createAndShowGUI(List<String> cities, List<Integer> fundingValues) 
         cityInfoPanel.repaint();
     }
 
+    /**
+     * Creates a card container for a graph component with a title.
+     * @param graph The graph component to display
+     * @param title The title for the graph card
+     * @return JPanel containing the styled graph card
+     */
     private JPanel createGraphCard(JComponent graph, String title) {
         JPanel card = new JPanel(new BorderLayout(15, 15));
         card.setBackground(Color.WHITE);
